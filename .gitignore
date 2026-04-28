@@ -1,0 +1,7 @@
+budget-pwa/backend/vendor/
+budget-pwa/backend/var/
+budget-pwa/frontend/node_modules/
+budget-pwa/frontend/dist/
+budget-pwa/.idea/
+.superpowers/
+*.lock
