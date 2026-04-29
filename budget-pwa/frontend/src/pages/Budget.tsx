@@ -68,7 +68,7 @@ const BudgetItem = ({
   budget: Budget; onClick: () => void; onDelete: () => void;
 }) => {
   const spent = budget.spent ?? 0;
-  const progress = Math.min((spent / budget.amount) * 100, 100);
+  const progress = budget.amount > 0 ? Math.min((spent / budget.amount) * 100, 100) : 0;
   const isOverBudget = spent > budget.amount;
   const categoryColor = budget.category?.color ?? '#9e9e9e';
   const currency = 'USD';
