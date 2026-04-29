@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use App\Entity\PlannedItem;
 use App\Repository\TransactionRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -66,6 +67,11 @@ class Transaction
     #[ORM\Column]
     #[Groups(['transaction:read'])]
     private ?\DateTimeImmutable $updatedAt = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    #[Groups(['transaction:read'])]
+    private ?PlannedItem $plannedItem = null;
 
     public function __construct()
     {
@@ -171,4 +177,7 @@ class Transaction
     {
         $this->updatedAt = new \DateTimeImmutable();
     }
+
+    public function getPlannedItem(): ?PlannedItem { return $this->plannedItem; }
+    public function setPlannedItem(?PlannedItem $plannedItem): static { $this->plannedItem = $plannedItem; return $this; }
 }
