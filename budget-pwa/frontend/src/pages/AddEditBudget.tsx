@@ -29,8 +29,6 @@ const MONTHS = [
   { value: 11, label: 'November' }, { value: 12, label: 'December' },
 ];
 
-const currentDate = new Date();
-
 const AddEditBudget = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
@@ -42,11 +40,9 @@ const AddEditBudget = () => {
   const updateMutation = useUpdateBudget(id || '');
   const deleteMutation = useDeleteBudget();
 
-  const [formData, setFormData] = useState({
-    amount: '',
-    category: '',
-    month: currentDate.getMonth() + 1,
-    year: currentDate.getFullYear(),
+  const [formData, setFormData] = useState(() => {
+    const now = new Date();
+    return { amount: '', category: '', month: now.getMonth() + 1, year: now.getFullYear() };
   });
 
   useEffect(() => {
@@ -83,8 +79,12 @@ const AddEditBudget = () => {
 
   const handleDelete = async () => {
     if (window.confirm('Delete this budget?')) {
-      await deleteMutation.mutateAsync(id!);
-      navigate('/budget');
+      try {
+        await deleteMutation.mutateAsync(id!);
+        navigate('/budget');
+      } catch (error) {
+        console.error('Failed to delete budget:', error);
+      }
     }
   };
 
