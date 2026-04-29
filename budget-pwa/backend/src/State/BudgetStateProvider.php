@@ -2,16 +2,15 @@
 
 namespace App\State;
 
+use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\Entity\Budget;
 use App\Repository\TransactionRepository;
-use Doctrine\ORM\EntityManagerInterface;
 
 final class BudgetStateProvider implements ProviderInterface
 {
     public function __construct(
-        private readonly EntityManagerInterface $entityManager,
         private readonly TransactionRepository $transactionRepository,
         private readonly ProviderInterface $itemProvider,
         private readonly ProviderInterface $collectionProvider,
@@ -19,7 +18,7 @@ final class BudgetStateProvider implements ProviderInterface
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
-        $isCollection = str_contains($operation::class, 'Collection');
+        $isCollection = $operation instanceof CollectionOperationInterface;
 
         if ($isCollection) {
             $budgets = $this->collectionProvider->provide($operation, $uriVariables, $context);
