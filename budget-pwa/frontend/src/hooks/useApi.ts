@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import apiClient from '../api/apiClient';
-import { Account, Transaction, Category, Budget, PlannedPayment, StatsSummary, MonthlyTrendItem } from '../types/api';
+import { Account, Transaction, Category, Budget, RecurringEvent, PlannedItem, ConfirmPayload, StatsSummary, MonthlyTrendItem } from '../types/api';
 
 interface ApiCollection<T> {
   'hydra:member': T[];
@@ -163,62 +163,136 @@ export const useBudgets = () => {
   });
 };
 
-export const usePlannedPayments = () => {
+// ── Recurring Events ──────────────────────────────────────────────────────────
+
+export const useRecurringEvents = () => {
   return useQuery({
-    queryKey: ['plannedPayments'],
+    queryKey: ['recurringEvents'],
     queryFn: async () => {
-      const { data } = await apiClient.get<ApiCollection<PlannedPayment>>('/planned_payments');
+      const { data } = await apiClient.get<ApiCollection<RecurringEvent>>('/recurring_events');
       return data['hydra:member'];
     },
   });
 };
 
-export const usePlannedPayment = (id?: string) => {
-  return useQuery({
-    queryKey: ['plannedPayment', id],
-    queryFn: async () => {
-      const { data } = await apiClient.get<PlannedPayment>(`/planned_payments/${id}`);
-      return data;
-    },
-    enabled: !!id,
-  });
-};
-
-export const useCreatePlannedPayment = () => {
+export const useCreateRecurringEvent = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (payment: Partial<PlannedPayment>) => {
-      const { data } = await apiClient.post<PlannedPayment>('/planned_payments', payment);
+    mutationFn: async (event: Partial<RecurringEvent>) => {
+      const { data } = await apiClient.post<RecurringEvent>('/recurring_events', event);
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['plannedPayments'] });
+      queryClient.invalidateQueries({ queryKey: ['recurringEvents'] });
     },
   });
 };
 
-export const useUpdatePlannedPayment = (id: string) => {
+export const useUpdateRecurringEvent = (id: string) => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (payment: Partial<PlannedPayment>) => {
-      const { data } = await apiClient.put<PlannedPayment>(`/planned_payments/${id}`, payment);
+    mutationFn: async (event: Partial<RecurringEvent>) => {
+      const { data } = await apiClient.put<RecurringEvent>(`/recurring_events/${id}`, event);
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['plannedPayments'] });
-      queryClient.invalidateQueries({ queryKey: ['plannedPayment', id] });
+      queryClient.invalidateQueries({ queryKey: ['recurringEvents'] });
     },
   });
 };
 
-export const useDeletePlannedPayment = () => {
+export const useDeleteRecurringEvent = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
-      await apiClient.delete(`/planned_payments/${id}`);
+      await apiClient.delete(`/recurring_events/${id}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['plannedPayments'] });
+      queryClient.invalidateQueries({ queryKey: ['recurringEvents'] });
+      queryClient.invalidateQueries({ queryKey: ['plannedItems'] });
+    },
+  });
+};
+
+// ── Planned Items ─────────────────────────────────────────────────────────────
+
+export const usePlannedItems = (month: number, year: number) => {
+  const after = new Date(year, month - 1, 1).toISOString();
+  const before = new Date(year, month, 0, 23, 59, 59).toISOString();
+  return useQuery({
+    queryKey: ['plannedItems', month, year],
+    queryFn: async () => {
+      const { data } = await apiClient.get<ApiCollection<PlannedItem>>('/planned_items', {
+        params: { 'dueDate[after]': after, 'dueDate[before]': before, itemsPerPage: 200 },
+      });
+      return data['hydra:member'];
+    },
+  });
+};
+
+export const useCreatePlannedItem = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (item: Partial<PlannedItem>) => {
+      const { data } = await apiClient.post<PlannedItem>('/planned_items', item);
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['plannedItems'] });
+    },
+  });
+};
+
+export const useUpdatePlannedItem = (id: string) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (item: Partial<PlannedItem>) => {
+      const { data } = await apiClient.put<PlannedItem>(`/planned_items/${id}`, item);
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['plannedItems'] });
+    },
+  });
+};
+
+export const useDeletePlannedItem = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      await apiClient.delete(`/planned_items/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['plannedItems'] });
+    },
+  });
+};
+
+export const useConfirmPlannedItem = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, payload }: { id: number; payload: ConfirmPayload }) => {
+      const { data } = await apiClient.post(`/plan/confirm/${id}`, payload);
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['plannedItems'] });
+      queryClient.invalidateQueries({ queryKey: ['transactions'] });
+      queryClient.invalidateQueries({ queryKey: ['accounts'] });
+      queryClient.invalidateQueries({ queryKey: ['stats'] });
+    },
+  });
+};
+
+export const useGenerateMonth = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ month, year }: { month: number; year: number }) => {
+      const { data } = await apiClient.post('/plan/generate_month', { month, year });
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['plannedItems'] });
     },
   });
 };
@@ -282,23 +356,6 @@ export const useDeleteTransaction = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['transactions'] });
       queryClient.invalidateQueries({ queryKey: ['accounts'] });
-    },
-  });
-};
-
-export const useTogglePlannedPaymentPaid = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: async ({ id, isPaid }: { id: string; isPaid: boolean }) => {
-      const { data } = await apiClient.patch<PlannedPayment>(
-        `/planned_payments/${id}`,
-        { isPaid },
-        { headers: { 'Content-Type': 'application/merge-patch+json' } }
-      );
-      return data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['plannedPayments'] });
     },
   });
 };
