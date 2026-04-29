@@ -21,6 +21,25 @@ class TransactionRepository extends ServiceEntityRepository
         parent::__construct($registry, Transaction::class);
     }
 
+    public function getMonthlyTotal(string $type, int $month, int $year): float
+    {
+        $start = new \DateTimeImmutable(sprintf('%d-%02d-01', $year, $month));
+        $end = $start->modify('first day of next month');
+
+        $result = $this->createQueryBuilder('t')
+            ->select('COALESCE(SUM(t.amount), 0) as total')
+            ->where('t.type = :type')
+            ->andWhere('t.date >= :start')
+            ->andWhere('t.date < :end')
+            ->setParameter('type', $type)
+            ->setParameter('start', $start)
+            ->setParameter('end', $end)
+            ->getQuery()
+            ->getSingleResult();
+
+        return (float) $result['total'];
+    }
+
     public function getSpentForBudget(int $categoryId, int $month, int $year): float
     {
         $start = new \DateTimeImmutable(sprintf('%d-%02d-01', $year, $month));
