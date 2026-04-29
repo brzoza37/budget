@@ -16,3 +16,7 @@ services:
         arguments:
             $itemProvider: '@api_platform.doctrine.orm.state.item_provider'
             $collectionProvider: '@api_platform.doctrine.orm.state.collection_provider'
+
+    App\State\RecurringEventDeleteProcessor:
+        bind:
+            $innerProcessor: '@api_platform.doctrine.orm.state.remove_processor'
