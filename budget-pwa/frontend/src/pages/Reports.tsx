@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   Box, Typography, CircularProgress, Stack, IconButton, Card, CardContent,
 } from '@mui/material';
@@ -31,7 +31,10 @@ const Reports = () => {
 
   const prevMonth = () => setViewDate((d) => new Date(d.getFullYear(), d.getMonth() - 1, 1));
   const nextMonth = () => setViewDate((d) => new Date(d.getFullYear(), d.getMonth() + 1, 1));
-  const canGoNext = viewDate < new Date();
+  const now = new Date();
+  const canGoNext =
+    viewDate.getFullYear() < now.getFullYear() ||
+    (viewDate.getFullYear() === now.getFullYear() && viewDate.getMonth() < now.getMonth());
 
   const categorySpend = transactions?.reduce<Record<string, { name: string; value: number; color: string }>>((acc, tx) => {
     const key = tx.category?.name ?? 'Uncategorized';
@@ -124,7 +127,7 @@ const Reports = () => {
                 <BarChart data={barData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} />
                   <XAxis dataKey="name" tick={{ fontSize: 11 }} tickFormatter={(v) => v.slice(5)} />
-                  <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `${Math.round(v / 1000)}k`} />
+                  <YAxis tick={{ fontSize: 11 }} tickFormatter={(v: number) => v < 1000 ? String(v) : `${Math.round(v / 1000)}k`} />
                   <Tooltip formatter={(v: number) => formatAmount(v, currency)} />
                   <Legend />
                   <Bar dataKey="Income" fill="#4CAF50" radius={[4, 4, 0, 0]} />
