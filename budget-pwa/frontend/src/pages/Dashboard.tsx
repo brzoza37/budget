@@ -6,7 +6,7 @@ import {
 import {
   Add as AddIcon, AccountBalance as AccountIcon,
   TrendingUp as IncomeIcon, TrendingDown as ExpenseIcon,
-  ChevronRight as ChevronRightIcon,
+  ChevronRight as ChevronRightIcon, BarChart as ReportsIcon,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
@@ -44,7 +44,12 @@ const Dashboard = () => {
   return (
     <Layout
       title="Budget"
-      actions={<IconButton onClick={() => navigate('/accounts')}><AccountIcon /></IconButton>}
+      actions={
+        <>
+          <IconButton onClick={() => navigate('/reports')}><ReportsIcon /></IconButton>
+          <IconButton onClick={() => navigate('/accounts')}><AccountIcon /></IconButton>
+        </>
+      }
     >
       <Box p={2}>
         {/* Total Balance */}
