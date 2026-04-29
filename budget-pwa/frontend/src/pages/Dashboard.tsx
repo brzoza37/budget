@@ -54,18 +54,49 @@ const Dashboard = () => {
             <Typography variant="h4" sx={{ fontWeight: 'bold', my: 1 }}>
               {formatAmount(stats?.totalBalance ?? 0, userCurrency)}
             </Typography>
-            {(stats?.plannedExpensesUnpaid ?? 0) > 0 && (
-              <>
-                <Typography variant="labelMedium" sx={{ opacity: 0.9 }}>
-                  Forecasted: {formatAmount(stats!.forecastedBalance, userCurrency)}
-                </Typography>
-                <Typography variant="labelSmall" sx={{ opacity: 0.7, display: 'block' }}>
-                  After {formatAmount(stats!.plannedExpensesUnpaid, userCurrency)} in planned payments
-                </Typography>
-              </>
-            )}
           </CardContent>
         </Card>
+
+        {/* Envelope Card */}
+        {((stats?.plannedIncomeThisMonth ?? 0) > 0 || (stats?.plannedExpensesThisMonth ?? 0) > 0) && (
+          <Card
+            sx={{ cursor: 'pointer', border: 'none', bgcolor: 'background.paper', mb: 2 }}
+            onClick={() => navigate('/plan')}
+          >
+            <CardContent sx={{ py: 2 }}>
+              <Typography variant="labelMedium" color="text.secondary" sx={{ display: 'block', mb: 1.5, textTransform: 'uppercase' }}>
+                {now.toLocaleDateString(undefined, { month: 'long', year: 'numeric' })} Plan
+              </Typography>
+              <Stack spacing={0.5}>
+                <Box display="flex" justifyContent="space-between">
+                  <Typography variant="body2" color="success.main">↑ Planned in</Typography>
+                  <Typography variant="body2" color="success.main" fontWeight="bold">
+                    {formatAmount(stats?.plannedIncomeThisMonth ?? 0, userCurrency)}
+                  </Typography>
+                </Box>
+                <Box display="flex" justifyContent="space-between">
+                  <Typography variant="body2" color="text.secondary">↓ Committed</Typography>
+                  <Typography variant="body2" color="text.secondary" fontWeight="bold">
+                    {formatAmount(stats?.plannedExpensesThisMonth ?? 0, userCurrency)}
+                  </Typography>
+                </Box>
+                <Box display="flex" justifyContent="space-between" sx={{ pt: 0.5, borderTop: '1px solid', borderColor: 'divider' }}>
+                  <Typography variant="body2" fontWeight="bold">✦ Free to plan</Typography>
+                  <Typography
+                    variant="body2"
+                    fontWeight="bold"
+                    color={(stats?.plannedIncomeThisMonth ?? 0) - (stats?.plannedExpensesThisMonth ?? 0) < 0 ? 'error.main' : 'text.primary'}
+                  >
+                    {formatAmount(
+                      (stats?.plannedIncomeThisMonth ?? 0) - (stats?.plannedExpensesThisMonth ?? 0),
+                      userCurrency
+                    )}
+                  </Typography>
+                </Box>
+              </Stack>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Income / Expense */}
         <Stack direction="row" spacing={2} mb={2}>
