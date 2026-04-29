@@ -1,0 +1,12 @@
+api_platform:
+    title: Budget API
+    version: 1.0.0
+    mapping:
+        paths: ['%kernel.project_dir%/src/Entity']
+    patch_formats:
+        json: ['application/merge-patch+json']
+    formats:
+        jsonld: ['application/ld+json']
+        json: ['application/json']
+    serializer:
+        enable_max_depth: true
