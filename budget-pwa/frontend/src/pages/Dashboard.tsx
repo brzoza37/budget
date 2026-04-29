@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   Box, Typography, Card, CardContent, IconButton, Fab,
-  CircularProgress, Stack, Chip,
+  CircularProgress, Stack,
 } from '@mui/material';
 import {
   Add as AddIcon, AccountBalance as AccountIcon,
