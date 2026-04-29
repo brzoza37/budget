@@ -28,23 +28,23 @@ class Category
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['category:read', 'transaction:read', 'budget:read', 'planned:read'])]
+    #[Groups(['category:read', 'transaction:read', 'budget:read', 'planned:read', 'plan:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['category:read', 'category:write', 'transaction:read', 'budget:read', 'planned:read'])]
+    #[Groups(['category:read', 'category:write', 'transaction:read', 'budget:read', 'planned:read', 'plan:read'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 50)]
-    #[Groups(['category:read', 'category:write', 'transaction:read', 'budget:read', 'planned:read'])]
+    #[Groups(['category:read', 'category:write', 'transaction:read', 'budget:read', 'planned:read', 'plan:read'])]
     private ?string $type = null; // INCOME or EXPENSE
 
     #[ORM\Column(length: 20)]
-    #[Groups(['category:read', 'category:write', 'transaction:read', 'budget:read', 'planned:read'])]
+    #[Groups(['category:read', 'category:write', 'transaction:read', 'budget:read', 'planned:read', 'plan:read'])]
     private ?string $color = '#FF5722';
 
     #[ORM\Column(length: 50)]
-    #[Groups(['category:read', 'category:write', 'transaction:read', 'budget:read', 'planned:read'])]
+    #[Groups(['category:read', 'category:write', 'transaction:read', 'budget:read', 'planned:read', 'plan:read'])]
     private ?string $icon = 'category';
 
     #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'subCategories')]

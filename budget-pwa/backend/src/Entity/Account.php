@@ -25,11 +25,11 @@ class Account
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['account:read', 'transaction:read', 'planned:read'])]
+    #[Groups(['account:read', 'transaction:read', 'planned:read', 'plan:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['account:read', 'account:write', 'transaction:read', 'planned:read'])]
+    #[Groups(['account:read', 'account:write', 'transaction:read', 'planned:read', 'plan:read'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 50)]
@@ -37,19 +37,19 @@ class Account
     private ?string $type = null;
 
     #[ORM\Column]
-    #[Groups(['account:read', 'account:write', 'transaction:read', 'planned:read'])]
+    #[Groups(['account:read', 'account:write', 'transaction:read', 'planned:read', 'plan:read'])]
     private ?float $balance = 0.0;
 
     #[ORM\Column(length: 10)]
-    #[Groups(['account:read', 'account:write', 'transaction:read', 'planned:read'])]
+    #[Groups(['account:read', 'account:write', 'transaction:read', 'planned:read', 'plan:read'])]
     private ?string $currency = 'USD';
 
     #[ORM\Column(length: 20)]
-    #[Groups(['account:read', 'account:write', 'transaction:read', 'planned:read'])]
+    #[Groups(['account:read', 'account:write', 'transaction:read', 'planned:read', 'plan:read'])]
     private ?string $color = '#4CAF50';
 
     #[ORM\Column(length: 50)]
-    #[Groups(['account:read', 'account:write', 'transaction:read', 'planned:read'])]
+    #[Groups(['account:read', 'account:write', 'transaction:read', 'planned:read', 'plan:read'])]
     private ?string $icon = 'account_balance_wallet';
 
     #[ORM\Column]

@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\Repository\AccountRepository;
-use App\Repository\PlannedPaymentRepository;
+use App\Repository\PlannedItemRepository;
 use App\Repository\TransactionRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -15,7 +15,7 @@ class StatsController extends AbstractController
     public function __construct(
         private readonly AccountRepository $accountRepository,
         private readonly TransactionRepository $transactionRepository,
-        private readonly PlannedPaymentRepository $plannedPaymentRepository,
+        private readonly PlannedItemRepository $plannedItemRepository,
     ) {}
 
     #[Route("/api/stats/summary", name: "stats_summary", methods: ["GET"])]
@@ -27,14 +27,16 @@ class StatsController extends AbstractController
         $totalBalance = $this->accountRepository->getTotalBalance();
         $monthlyIncome = $this->transactionRepository->getMonthlyTotal("INCOME", $month, $year);
         $monthlyExpense = $this->transactionRepository->getMonthlyTotal("EXPENSE", $month, $year);
-        $plannedExpensesUnpaid = $this->plannedPaymentRepository->getUnpaidExpensesTotal();
-        $forecastedBalance = $totalBalance - $plannedExpensesUnpaid;
+        $plannedIncomeThisMonth = $this->plannedItemRepository->getPlannedIncomeForMonth($month, $year);
+        $plannedExpensesThisMonth = $this->plannedItemRepository->getPlannedExpensesForMonth($month, $year);
+        $forecastedBalance = $totalBalance + $plannedIncomeThisMonth - $plannedExpensesThisMonth;
 
         return $this->json([
             "totalBalance" => $totalBalance,
             "monthlyIncome" => $monthlyIncome,
             "monthlyExpense" => $monthlyExpense,
-            "plannedExpensesUnpaid" => $plannedExpensesUnpaid,
+            "plannedIncomeThisMonth" => $plannedIncomeThisMonth,
+            "plannedExpensesThisMonth" => $plannedExpensesThisMonth,
             "forecastedBalance" => $forecastedBalance,
         ]);
     }
