@@ -32,6 +32,7 @@ export interface Transaction {
   toAccount?: Account;
   note?: string;
   date: string;
+  plannedItem?: { id: number };
   createdAt?: string;
 }
 
@@ -45,23 +46,54 @@ export interface Budget {
   spent?: number;
 }
 
-export interface PlannedPayment {
+export interface RecurringEvent {
   '@id'?: string;
   id?: number;
   name: string;
   amount: number;
+  type: 'INCOME' | 'EXPENSE';
+  category?: Category;
+  account?: Account;
+  repeatEvery: number;
+  repeatUnit: 'days' | 'weeks' | 'months' | 'years';
+  dayOfMonth?: number | null;
+  startDate: string;
+  note?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface PlannedItem {
+  '@id'?: string;
+  id?: number;
+  name: string;
+  amount: number;
+  type: 'INCOME' | 'EXPENSE';
   category?: Category;
   account?: Account;
   dueDate: string;
   isPaid: boolean;
+  paidAmount?: number | null;
+  paidAt?: string | null;
+  paidTransaction?: { id: number } | null;
+  recurringEvent?: RecurringEvent | null;
   note?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface ConfirmPayload {
+  amount: number;
+  accountId: number;
+  date: string;
 }
 
 export interface StatsSummary {
   totalBalance: number;
   monthlyIncome: number;
   monthlyExpense: number;
-  plannedExpensesUnpaid: number;
+  plannedIncomeThisMonth: number;
+  plannedExpensesThisMonth: number;
   forecastedBalance: number;
 }
 
