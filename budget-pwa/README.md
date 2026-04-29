@@ -67,24 +67,26 @@ To faithfully reproduce the experience, we'll use a **Symfony API + React SPA** 
 
 #### Local Development Setup
 1. Clone the repository and navigate to the `budget-pwa` directory.
-2. Create an `.env` file in the `backend` folder based on `.env.example`.
-3. Run the application using Docker:
+2. Start all services (backend, frontend, nginx, database):
    ```bash
-   docker-compose up -d
+   docker compose up -d
    ```
-4. Install backend dependencies and run migrations:
+3. Install backend dependencies and apply the database schema:
    ```bash
-   docker-compose exec php composer install
-   docker-compose exec php bin/console doctrine:migrations:migrate --no-interaction
+   docker compose exec backend composer install
+   docker compose exec backend php bin/console doctrine:schema:create --no-interaction
    ```
-5. Install frontend dependencies and start the dev server:
+4. (Optional) Seed sample data for testing:
    ```bash
-   docker-compose exec node npm install
-   docker-compose exec node npm run dev
+   docker compose exec backend php bin/console app:seed-data
+   ```
+5. Install frontend dependencies (the dev server starts automatically):
+   ```bash
+   docker compose exec frontend npm install
    ```
 6. Access the application:
    - Frontend: `http://localhost:3000`
-   - API Docs: `http://localhost:8000/api` (via Symfony)
+   - API: `http://localhost:8000/api`
 
 #### PWA Verification
 - Open the application in a mobile browser (or Chrome on desktop).
