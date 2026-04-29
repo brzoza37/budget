@@ -10,11 +10,11 @@ import AddEditAccount from './pages/AddEditAccount';
 import Categories from './pages/Categories';
 import AddEditCategory from './pages/AddEditCategory';
 import Budget from './pages/Budget';
-import PlannedPayments from './pages/PlannedPayments';
+import MonthlyPlan from './pages/MonthlyPlan';
 import Reports from './pages/Reports';
 import Settings from './pages/Settings';
 import AddEditBudget from './pages/AddEditBudget';
-import AddEditPlannedPayment from './pages/AddEditPlannedPayment';
+import AddEditPlanItem from './pages/AddEditPlanItem';
 
 const queryClient = new QueryClient();
 
@@ -38,9 +38,9 @@ function App() {
             <Route path="/budget" element={<Budget />} />
             <Route path="/budget/add" element={<AddEditBudget />} />
             <Route path="/budget/edit/:id" element={<AddEditBudget />} />
-            <Route path="/planned-payments" element={<PlannedPayments />} />
-            <Route path="/planned-payments/add" element={<AddEditPlannedPayment />} />
-            <Route path="/planned-payments/edit/:id" element={<AddEditPlannedPayment />} />
+            <Route path="/plan" element={<MonthlyPlan />} />
+            <Route path="/plan/add" element={<AddEditPlanItem />} />
+            <Route path="/plan/edit/:id" element={<AddEditPlanItem />} />
             <Route path="/reports" element={<Reports />} />
             <Route path="/settings" element={<Settings />} />
           </Routes>

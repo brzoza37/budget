@@ -20,7 +20,7 @@ import {
 import {
   Dashboard as DashboardIcon,
   List as TransactionsIcon,
-  PieChart as ReportsIcon,
+  CalendarMonth as CalendarMonthIcon,
   Settings as SettingsIcon,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -37,7 +37,7 @@ const SIDEBAR_WIDTH = 240;
 const NAV_ITEMS = [
   { label: 'Dashboard', icon: <DashboardIcon />, path: '/' },
   { label: 'Transactions', icon: <TransactionsIcon />, path: '/transactions' },
-  { label: 'Reports', icon: <ReportsIcon />, path: '/reports' },
+  { label: 'Plan', icon: <CalendarMonthIcon />, path: '/plan' },
   { label: 'Settings', icon: <SettingsIcon />, path: '/settings' },
 ];
 
