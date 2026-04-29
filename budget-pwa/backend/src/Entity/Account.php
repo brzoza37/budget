@@ -17,7 +17,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
         new \ApiPlatform\Metadata\Patch(),
         new \ApiPlatform\Metadata\Delete(),
     ],
-    normalizationContext: ['groups' => ['account:read']],
+    normalizationContext: ['groups' => ['account:read'], 'enable_max_depth' => true],
     denormalizationContext: ['groups' => ['account:write']],
 )]
 class Account
