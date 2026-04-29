@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useMemo } from 'react';
+import React, { createContext, useContext, useState, useMemo, useCallback } from 'react';
 import { ThemeProvider } from '@mui/material/styles';
 import { lightTheme, darkTheme } from '../theme/theme';
 
@@ -19,15 +19,15 @@ export const AppThemeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     return localStorage.getItem('theme-mode') === 'dark';
   });
 
-  const toggleTheme = () => {
+  const toggleTheme = useCallback(() => {
     setIsDark((prev) => {
       const next = !prev;
       localStorage.setItem('theme-mode', next ? 'dark' : 'light');
       return next;
     });
-  };
+  }, []);
 
-  const value = useMemo(() => ({ isDark, toggleTheme }), [isDark]);
+  const value = useMemo(() => ({ isDark, toggleTheme }), [isDark, toggleTheme]);
 
   return (
     <ThemeContext.Provider value={value}>

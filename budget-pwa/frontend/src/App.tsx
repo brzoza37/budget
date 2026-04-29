@@ -23,7 +23,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <CssBaseline />
       <Router>
-        <Box sx={{ pb: { xs: 8, md: 0 }, minHeight: '100vh', bgcolor: 'background.default' }}>
+        <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/transactions" element={<Transactions />} />
