@@ -22,12 +22,15 @@ class AuthController extends AbstractController
         JWTTokenManagerInterface $jwtManager,
     ): JsonResponse {
         $data = json_decode($request->getContent(), true) ?? [];
-        $email = trim((string) ($data['email'] ?? ''));
+        $email = strtolower(trim((string) ($data['email'] ?? '')));
         $password = (string) ($data['password'] ?? '');
         $displayName = trim((string) ($data['displayName'] ?? ''));
 
         if ($email === '' || $password === '' || $displayName === '') {
             return $this->json(['error' => 'email, password, and displayName are required'], Response::HTTP_BAD_REQUEST);
+        }
+        if (mb_strlen($displayName) > 255) {
+            return $this->json(['error' => 'displayName must not exceed 255 characters'], Response::HTTP_BAD_REQUEST);
         }
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             return $this->json(['error' => 'Invalid email address'], Response::HTTP_BAD_REQUEST);
@@ -61,8 +64,10 @@ class AuthController extends AbstractController
     #[Route('/api/auth/me', name: 'auth_me', methods: ['GET'])]
     public function me(): JsonResponse
     {
-        /** @var User $user */
         $user = $this->getUser();
+        if (!$user instanceof User) {
+            throw $this->createAccessDeniedException();
+        }
 
         return $this->json([
             'id' => $user->getId(),
