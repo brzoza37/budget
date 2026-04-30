@@ -102,3 +102,10 @@ export interface MonthlyTrendItem {
   income: number;
   expense: number;
 }
+
+export interface AuthUser {
+  id: number;
+  email: string;
+  displayName: string;
+  currency: string;
+}
