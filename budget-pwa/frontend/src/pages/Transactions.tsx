@@ -47,7 +47,8 @@ const Transactions = () => {
         return;
       }
       exportToCsv(txs);
-    } catch {
+    } catch (err) {
+      console.error('CSV export failed', err);
       setExportError('Export failed. Please try again.');
     } finally {
       setExporting(false);
@@ -89,7 +90,7 @@ const Transactions = () => {
       title="Transactions"
       actions={
         <Box display="flex" gap={1}>
-          <IconButton onClick={handleExport} disabled={exporting} title="Export CSV">
+          <IconButton onClick={handleExport} disabled={exporting} title="Export CSV" aria-label="Export CSV">
             {exporting ? <CircularProgress size={20} /> : <DownloadIcon />}
           </IconButton>
           <IconButton onClick={() => setFilterOpen(true)}>
