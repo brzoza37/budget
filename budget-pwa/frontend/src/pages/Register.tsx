@@ -11,11 +11,16 @@ export default function Register() {
   const [displayName, setDisplayName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
     setError('');
     setLoading(true);
     try {
@@ -69,6 +74,18 @@ export default function Register() {
             inputProps={{ minLength: 8 }}
             helperText="At least 8 characters"
             autoComplete="new-password"
+            sx={{ mb: 2 }}
+          />
+          <TextField
+            label="Confirm password"
+            type="password"
+            fullWidth
+            value={confirmPassword}
+            onChange={e => setConfirmPassword(e.target.value)}
+            required
+            autoComplete="new-password"
+            error={confirmPassword.length > 0 && password !== confirmPassword}
+            helperText={confirmPassword.length > 0 && password !== confirmPassword ? 'Passwords do not match' : ' '}
             sx={{ mb: 3 }}
           />
           <Button type="submit" variant="contained" fullWidth size="large" disabled={loading}>
