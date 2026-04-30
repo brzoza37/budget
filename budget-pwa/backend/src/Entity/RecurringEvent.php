@@ -9,6 +9,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Patch;
+use App\Entity\User;
 use App\Repository\RecurringEventRepository;
 use App\State\RecurringEventDeleteProcessor;
 use Doctrine\ORM\Mapping as ORM;
@@ -17,6 +18,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ORM\Entity(repositoryClass: RecurringEventRepository::class)]
 #[ORM\HasLifecycleCallbacks]
 #[ApiResource(
+    security: "is_granted('ROLE_USER')",
     operations: [
         new Get(),
         new GetCollection(),
@@ -85,6 +87,13 @@ class RecurringEvent
     #[ORM\Column]
     #[Groups(['recurring:read'])]
     private ?\DateTimeImmutable $updatedAt = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    private ?User $user = null;
+
+    public function getUser(): ?User { return $this->user; }
+    public function setUser(?User $user): static { $this->user = $user; return $this; }
 
     public function __construct()
     {

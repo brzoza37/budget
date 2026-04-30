@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use App\Entity\User;
 use App\Repository\CategoryRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -12,6 +13,7 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
 
 #[ORM\Entity(repositoryClass: CategoryRepository::class)]
 #[ApiResource(
+    security: "is_granted('ROLE_USER')",
     operations: [
         new \ApiPlatform\Metadata\Get(),
         new \ApiPlatform\Metadata\GetCollection(),
@@ -69,6 +71,13 @@ class Category
     #[ORM\Column]
     #[Groups(['category:read'])]
     private ?\DateTimeImmutable $updatedAt = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    private ?User $user = null;
+
+    public function getUser(): ?User { return $this->user; }
+    public function setUser(?User $user): static { $this->user = $user; return $this; }
 
     public function __construct()
     {

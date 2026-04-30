@@ -3,12 +3,14 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use App\Entity\User;
 use App\Repository\AccountRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: AccountRepository::class)]
 #[ApiResource(
+    security: "is_granted('ROLE_USER')",
     operations: [
         new \ApiPlatform\Metadata\Get(),
         new \ApiPlatform\Metadata\GetCollection(),
@@ -63,6 +65,13 @@ class Account
     #[ORM\Column]
     #[Groups(['account:read'])]
     private ?\DateTimeImmutable $updatedAt = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    private ?User $user = null;
+
+    public function getUser(): ?User { return $this->user; }
+    public function setUser(?User $user): static { $this->user = $user; return $this; }
 
     public function __construct()
     {

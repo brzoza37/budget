@@ -4,12 +4,14 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use App\Entity\PlannedItem;
+use App\Entity\User;
 use App\Repository\TransactionRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: TransactionRepository::class)]
 #[ApiResource(
+    security: "is_granted('ROLE_USER')",
     operations: [
         new \ApiPlatform\Metadata\Get(),
         new \ApiPlatform\Metadata\GetCollection(),
@@ -72,6 +74,13 @@ class Transaction
     #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     #[Groups(['transaction:read'])]
     private ?PlannedItem $plannedItem = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    private ?User $user = null;
+
+    public function getUser(): ?User { return $this->user; }
+    public function setUser(?User $user): static { $this->user = $user; return $this; }
 
     public function __construct()
     {

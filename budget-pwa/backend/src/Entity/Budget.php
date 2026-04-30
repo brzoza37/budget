@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use App\Entity\User;
 use App\Repository\BudgetRepository;
 use App\State\BudgetStateProvider;
 use Doctrine\ORM\Mapping as ORM;
@@ -10,6 +11,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: BudgetRepository::class)]
 #[ApiResource(
+    security: "is_granted('ROLE_USER')",
     operations: [
         new \ApiPlatform\Metadata\Get(provider: BudgetStateProvider::class),
         new \ApiPlatform\Metadata\GetCollection(provider: BudgetStateProvider::class),
@@ -56,6 +58,13 @@ class Budget
 
     #[Groups(['budget:read'])]
     private float $spent = 0.0;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    private ?User $user = null;
+
+    public function getUser(): ?User { return $this->user; }
+    public function setUser(?User $user): static { $this->user = $user; return $this; }
 
     public function __construct()
     {
