@@ -22,6 +22,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
     ],
     normalizationContext: ['groups' => ['transaction:read'], 'enable_max_depth' => true],
     denormalizationContext: ['groups' => ['transaction:write']],
+    paginationMaximumItemsPerPage: 1000,
 )]
 class Transaction
 {
