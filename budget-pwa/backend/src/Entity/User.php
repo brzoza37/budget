@@ -29,6 +29,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 3)]
     private string $currency = 'USD';
 
+    #[ORM\Column(length: 5)]
+    private string $locale = 'en';
+
     #[ORM\Column(type: 'json')]
     private array $roles = [];
 
@@ -63,6 +66,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getCurrency(): string { return $this->currency; }
     public function setCurrency(string $currency): static { $this->currency = $currency; return $this; }
+
+    public function getLocale(): string { return $this->locale; }
+    public function setLocale(string $locale): static { $this->locale = $locale; return $this; }
 
     public function getCreatedAt(): ?\DateTimeImmutable { return $this->createdAt; }
 
