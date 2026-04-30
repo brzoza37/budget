@@ -5,6 +5,15 @@ import apiClient from '../api/apiClient';
 import { useAuth } from '../context/AuthContext';
 import { AuthUser } from '../types/api';
 
+const PASSWORD_RULES = [
+  { label: 'At least 12 characters', test: (p: string) => p.length >= 12 },
+  { label: 'One uppercase letter', test: (p: string) => /[A-Z]/.test(p) },
+  { label: 'One number', test: (p: string) => /[0-9]/.test(p) },
+  { label: 'One special character', test: (p: string) => /[^A-Za-z0-9]/.test(p) },
+];
+
+const isPasswordValid = (p: string) => PASSWORD_RULES.every(r => r.test(p));
+
 export default function Register() {
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -12,11 +21,16 @@ export default function Register() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [passwordTouched, setPasswordTouched] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isPasswordValid(password)) {
+      setError('Password does not meet all requirements');
+      return;
+    }
     if (password !== confirmPassword) {
       setError('Passwords do not match');
       return;
@@ -38,6 +52,8 @@ export default function Register() {
       setLoading(false);
     }
   };
+
+  const passwordError = passwordTouched && !isPasswordValid(password);
 
   return (
     <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: 'background.default' }}>
@@ -70,12 +86,28 @@ export default function Register() {
             fullWidth
             value={password}
             onChange={e => setPassword(e.target.value)}
+            onBlur={() => setPasswordTouched(true)}
             required
-            inputProps={{ minLength: 8 }}
-            helperText="At least 8 characters"
+            error={passwordError}
             autoComplete="new-password"
-            sx={{ mb: 2 }}
+            sx={{ mb: 1 }}
           />
+          <Box sx={{ mb: 2, pl: 0.5 }}>
+            {PASSWORD_RULES.map(rule => {
+              const met = rule.test(password);
+              const show = passwordTouched || password.length > 0;
+              return (
+                <Typography
+                  key={rule.label}
+                  variant="caption"
+                  display="block"
+                  sx={{ color: show ? (met ? 'success.main' : 'error.main') : 'text.secondary' }}
+                >
+                  {show ? (met ? '✓' : '✗') : '·'} {rule.label}
+                </Typography>
+              );
+            })}
+          </Box>
           <TextField
             label="Confirm password"
             type="password"

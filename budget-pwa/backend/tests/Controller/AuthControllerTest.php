@@ -7,6 +7,8 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class AuthControllerTest extends WebTestCase
 {
+    private const VALID_PASSWORD = 'Secret123!@#';
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -32,7 +34,7 @@ class AuthControllerTest extends WebTestCase
         $client = static::createClient();
         $this->jsonPost($client, '/api/auth/register', [
             'email' => 'test@example.com',
-            'password' => 'secret123',
+            'password' => self::VALID_PASSWORD,
             'displayName' => 'Test User',
         ]);
         $this->assertResponseStatusCodeSame(201);
@@ -47,7 +49,7 @@ class AuthControllerTest extends WebTestCase
     public function testRegisterRejectsDuplicateEmail(): void
     {
         $client = static::createClient();
-        $payload = ['email' => 'dup@example.com', 'password' => 'secret123', 'displayName' => 'Dup'];
+        $payload = ['email' => 'dup@example.com', 'password' => self::VALID_PASSWORD, 'displayName' => 'Dup'];
         $this->jsonPost($client, '/api/auth/register', $payload);
         $this->assertResponseStatusCodeSame(201);
         $this->jsonPost($client, '/api/auth/register', $payload);
@@ -59,19 +61,19 @@ class AuthControllerTest extends WebTestCase
         $client = static::createClient();
         $this->jsonPost($client, '/api/auth/register', [
             'email' => 'not-an-email',
-            'password' => 'secret123',
+            'password' => self::VALID_PASSWORD,
             'displayName' => 'Bad',
         ]);
         $this->assertResponseStatusCodeSame(400);
     }
 
-    public function testRegisterValidatesPasswordLength(): void
+    public function testRegisterValidatesPasswordStrength(): void
     {
         $client = static::createClient();
         $this->jsonPost($client, '/api/auth/register', [
-            'email' => 'short@example.com',
+            'email' => 'weak@example.com',
             'password' => 'short',
-            'displayName' => 'Short',
+            'displayName' => 'Weak',
         ]);
         $this->assertResponseStatusCodeSame(400);
     }
@@ -81,12 +83,12 @@ class AuthControllerTest extends WebTestCase
         $client = static::createClient();
         $this->jsonPost($client, '/api/auth/register', [
             'email' => 'login@example.com',
-            'password' => 'secret123',
+            'password' => self::VALID_PASSWORD,
             'displayName' => 'Login User',
         ]);
         $this->jsonPost($client, '/api/auth/login', [
             'email' => 'login@example.com',
-            'password' => 'secret123',
+            'password' => self::VALID_PASSWORD,
         ]);
         $this->assertResponseIsSuccessful();
         $data = json_decode($client->getResponse()->getContent(), true);
@@ -99,7 +101,7 @@ class AuthControllerTest extends WebTestCase
         $client = static::createClient();
         $this->jsonPost($client, '/api/auth/register', [
             'email' => 'wrong@example.com',
-            'password' => 'secret123',
+            'password' => self::VALID_PASSWORD,
             'displayName' => 'Wrong',
         ]);
         $this->jsonPost($client, '/api/auth/login', [
@@ -121,7 +123,7 @@ class AuthControllerTest extends WebTestCase
         $client = static::createClient();
         $this->jsonPost($client, '/api/auth/register', [
             'email' => 'me@example.com',
-            'password' => 'secret123',
+            'password' => self::VALID_PASSWORD,
             'displayName' => 'Me User',
         ]);
         $token = json_decode($client->getResponse()->getContent(), true)['token'];

@@ -35,8 +35,8 @@ class AuthController extends AbstractController
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             return $this->json(['error' => 'Invalid email address'], Response::HTTP_BAD_REQUEST);
         }
-        if (strlen($password) < 8) {
-            return $this->json(['error' => 'Password must be at least 8 characters'], Response::HTTP_BAD_REQUEST);
+        if (strlen($password) < 12 || !preg_match('/[A-Z]/', $password) || !preg_match('/[0-9]/', $password) || !preg_match('/[^A-Za-z0-9]/', $password)) {
+            return $this->json(['error' => 'Password must be at least 12 characters and contain an uppercase letter, a number, and a special character'], Response::HTTP_BAD_REQUEST);
         }
         if ($em->getRepository(User::class)->findOneBy(['email' => $email])) {
             return $this->json(['error' => 'Email already registered'], Response::HTTP_CONFLICT);

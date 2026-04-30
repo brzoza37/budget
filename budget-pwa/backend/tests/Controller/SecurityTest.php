@@ -30,7 +30,7 @@ class SecurityTest extends WebTestCase
         $client = static::createClient();
         $client->request('POST', '/api/auth/register', [], [], ['CONTENT_TYPE' => 'application/json'], json_encode([
             'email' => 'scope@example.com',
-            'password' => 'secret123',
+            'password' => 'Secret123!@#',
             'displayName' => 'Scope User',
         ]));
         $token = json_decode($client->getResponse()->getContent(), true)['token'];
