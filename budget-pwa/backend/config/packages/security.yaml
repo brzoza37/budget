@@ -13,10 +13,6 @@ security:
             pattern: ^/(_profiler|_wdt|assets|build)/
             security: false
 
-        auth_public:
-            pattern: ^/api/auth/(login|register)$
-            security: false
-
         main:
             pattern: ^/api
             stateless: true
