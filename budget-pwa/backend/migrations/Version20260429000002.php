@@ -9,6 +9,8 @@ use Doctrine\Migrations\AbstractMigration;
 
 final class Version20260429000002 extends AbstractMigration
 {
+    private const DATA_TABLES = ['account', 'category', 'transaction', 'budget', 'recurring_event', 'planned_item'];
+
     public function getDescription(): string
     {
         return 'Insert seed user and assign all existing rows to that user';
@@ -16,8 +18,6 @@ final class Version20260429000002 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        // password_hash('Admin1234!', PASSWORD_BCRYPT, ['cost' => 10])
-        // Pre-computed to avoid runtime PHP in addSql — change password after first login
         $hash = password_hash('Admin1234!', PASSWORD_BCRYPT, ['cost' => 10]);
 
         $this->connection->executeStatement(
@@ -32,7 +32,7 @@ final class Version20260429000002 extends AbstractMigration
             ]
         );
 
-        foreach (['account', 'category', 'transaction', 'budget', 'recurring_event', 'planned_item'] as $table) {
+        foreach (self::DATA_TABLES as $table) {
             $this->connection->executeStatement(
                 "UPDATE \"$table\" SET user_id = (SELECT id FROM \"user\" WHERE email = 'admin@localhost') WHERE user_id IS NULL"
             );
@@ -41,8 +41,10 @@ final class Version20260429000002 extends AbstractMigration
 
     public function down(Schema $schema): void
     {
-        foreach (['account', 'category', 'transaction', 'budget', 'recurring_event', 'planned_item'] as $table) {
-            $this->connection->executeStatement("UPDATE \"$table\" SET user_id = NULL");
+        foreach (self::DATA_TABLES as $table) {
+            $this->connection->executeStatement(
+                "UPDATE \"$table\" SET user_id = NULL WHERE user_id = (SELECT id FROM \"user\" WHERE email = 'admin@localhost')"
+            );
         }
         $this->connection->executeStatement("DELETE FROM \"user\" WHERE email = 'admin@localhost'");
     }
