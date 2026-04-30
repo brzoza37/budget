@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\PlannedItem;
 use App\Entity\RecurringEvent;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -17,7 +18,7 @@ class PlannedItemRepository extends ServiceEntityRepository
         parent::__construct($registry, PlannedItem::class);
     }
 
-    public function getPlannedIncomeForMonth(int $month, int $year): float
+    public function getPlannedIncomeForMonth(int $month, int $year, User $user): float
     {
         $start = new \DateTimeImmutable(sprintf('%d-%02d-01', $year, $month));
         $end = $start->modify('first day of next month');
@@ -28,16 +29,18 @@ class PlannedItemRepository extends ServiceEntityRepository
             ->andWhere('p.isPaid = false')
             ->andWhere('p.dueDate >= :start')
             ->andWhere('p.dueDate < :end')
+            ->andWhere('p.user = :user')
             ->setParameter('type', 'INCOME')
             ->setParameter('start', $start)
             ->setParameter('end', $end)
+            ->setParameter('user', $user)
             ->getQuery()
             ->getSingleResult();
 
         return (float) $result['total'];
     }
 
-    public function getPlannedExpensesForMonth(int $month, int $year): float
+    public function getPlannedExpensesForMonth(int $month, int $year, User $user): float
     {
         $start = new \DateTimeImmutable(sprintf('%d-%02d-01', $year, $month));
         $end = $start->modify('first day of next month');
@@ -48,9 +51,11 @@ class PlannedItemRepository extends ServiceEntityRepository
             ->andWhere('p.isPaid = false')
             ->andWhere('p.dueDate >= :start')
             ->andWhere('p.dueDate < :end')
+            ->andWhere('p.user = :user')
             ->setParameter('type', 'EXPENSE')
             ->setParameter('start', $start)
             ->setParameter('end', $end)
+            ->setParameter('user', $user)
             ->getQuery()
             ->getSingleResult();
 

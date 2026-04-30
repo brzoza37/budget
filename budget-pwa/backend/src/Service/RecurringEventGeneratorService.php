@@ -38,6 +38,7 @@ class RecurringEventGeneratorService
             $item->setAccount($event->getAccount());
             $item->setDueDate($date);
             $item->setRecurringEvent($event);
+            $item->setUser($event->getUser());
             $item->setNote($event->getNote());
 
             $this->em->persist($item);

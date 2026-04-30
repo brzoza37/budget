@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\PlannedItem;
 use App\Entity\Transaction;
+use App\Entity\User;
 use App\Repository\AccountRepository;
 use App\Repository\PlannedItemRepository;
 use App\Repository\RecurringEventRepository;
@@ -28,8 +29,10 @@ class PlanController extends AbstractController
     #[Route('/api/plan/confirm/{id}', name: 'plan_confirm', methods: ['POST'])]
     public function confirm(int $id, Request $request): JsonResponse
     {
+        /** @var User $currentUser */
+        $currentUser = $this->getUser();
         $item = $this->plannedItemRepository->find($id);
-        if (!$item) {
+        if (!$item || $item->getUser() !== $currentUser) {
             return $this->json(['error' => 'PlannedItem not found'], Response::HTTP_NOT_FOUND);
         }
 
@@ -94,7 +97,9 @@ class PlanController extends AbstractController
             return $this->json(['error' => 'Invalid month'], Response::HTTP_BAD_REQUEST);
         }
 
-        $events = $this->recurringEventRepository->findAllActive();
+        /** @var User $currentUser */
+        $currentUser = $this->getUser();
+        $events = $this->recurringEventRepository->findAllActiveForUser($currentUser);
         $generated = $this->generator->generateForMonth($events, $month, $year);
 
         return $this->json(['generated' => $generated]);

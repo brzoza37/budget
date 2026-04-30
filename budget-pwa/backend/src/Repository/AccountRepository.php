@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Account;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -21,11 +22,13 @@ class AccountRepository extends ServiceEntityRepository
         parent::__construct($registry, Account::class);
     }
 
-    public function getTotalBalance(): float
+    public function getTotalBalance(User $user): float
     {
         $result = $this->createQueryBuilder('a')
             ->select('COALESCE(SUM(a.balance), 0) as total')
             ->where('a.isArchived = false')
+            ->andWhere('a.user = :user')
+            ->setParameter('user', $user)
             ->getQuery()
             ->getSingleResult();
 

@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
 use App\Repository\AccountRepository;
 use App\Repository\PlannedItemRepository;
 use App\Repository\TransactionRepository;
@@ -24,11 +25,13 @@ class StatsController extends AbstractController
         $year = (int) $request->query->get("year", date("Y"));
         $month = (int) $request->query->get("month", date("n"));
 
-        $totalBalance = $this->accountRepository->getTotalBalance();
-        $monthlyIncome = $this->transactionRepository->getMonthlyTotal("INCOME", $month, $year);
-        $monthlyExpense = $this->transactionRepository->getMonthlyTotal("EXPENSE", $month, $year);
-        $plannedIncomeThisMonth = $this->plannedItemRepository->getPlannedIncomeForMonth($month, $year);
-        $plannedExpensesThisMonth = $this->plannedItemRepository->getPlannedExpensesForMonth($month, $year);
+        /** @var User $user */
+        $user = $this->getUser();
+        $totalBalance = $this->accountRepository->getTotalBalance($user);
+        $monthlyIncome = $this->transactionRepository->getMonthlyTotal("INCOME", $month, $year, $user);
+        $monthlyExpense = $this->transactionRepository->getMonthlyTotal("EXPENSE", $month, $year, $user);
+        $plannedIncomeThisMonth = $this->plannedItemRepository->getPlannedIncomeForMonth($month, $year, $user);
+        $plannedExpensesThisMonth = $this->plannedItemRepository->getPlannedExpensesForMonth($month, $year, $user);
         $forecastedBalance = $totalBalance + $plannedIncomeThisMonth - $plannedExpensesThisMonth;
 
         return $this->json([
@@ -47,6 +50,8 @@ class StatsController extends AbstractController
         $months = (int) $request->query->get("months", 6);
         $months = min(max($months, 1), 24);
 
+        /** @var User $user */
+        $user = $this->getUser();
         $data = [];
         for ($i = $months - 1; $i >= 0; $i--) {
             $date = new \DateTimeImmutable("first day of -$i months");
@@ -55,8 +60,8 @@ class StatsController extends AbstractController
 
             $data[] = [
                 "month" => $date->format("Y-m"),
-                "income" => $this->transactionRepository->getMonthlyTotal("INCOME", $month, $year),
-                "expense" => $this->transactionRepository->getMonthlyTotal("EXPENSE", $month, $year),
+                "income" => $this->transactionRepository->getMonthlyTotal("INCOME", $month, $year, $user),
+                "expense" => $this->transactionRepository->getMonthlyTotal("EXPENSE", $month, $year, $user),
             ];
         }
 

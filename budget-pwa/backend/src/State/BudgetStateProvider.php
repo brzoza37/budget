@@ -6,7 +6,9 @@ use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\Entity\Budget;
+use App\Entity\User;
 use App\Repository\TransactionRepository;
+use Symfony\Bundle\SecurityBundle\Security;
 
 final class BudgetStateProvider implements ProviderInterface
 {
@@ -14,6 +16,7 @@ final class BudgetStateProvider implements ProviderInterface
         private readonly TransactionRepository $transactionRepository,
         private readonly ProviderInterface $itemProvider,
         private readonly ProviderInterface $collectionProvider,
+        private readonly Security $security,
     ) {}
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
@@ -40,10 +43,13 @@ final class BudgetStateProvider implements ProviderInterface
         if ($budget->getCategory() === null) {
             return;
         }
+        /** @var User $user */
+        $user = $this->security->getUser();
         $spent = $this->transactionRepository->getSpentForBudget(
             $budget->getCategory()->getId(),
             $budget->getMonth(),
             $budget->getYear(),
+            $user,
         );
         $budget->setSpent($spent);
     }
