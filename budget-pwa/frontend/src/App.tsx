@@ -15,6 +15,9 @@ import Reports from './pages/Reports';
 import Settings from './pages/Settings';
 import AddEditBudget from './pages/AddEditBudget';
 import AddEditPlanItem from './pages/AddEditPlanItem';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import ProtectedRoute from './components/ProtectedRoute';
 
 const queryClient = new QueryClient();
 
@@ -25,24 +28,26 @@ function App() {
       <Router>
         <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
           <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/transactions" element={<Transactions />} />
-            <Route path="/transactions/add" element={<AddEditTransaction />} />
-            <Route path="/transactions/edit/:id" element={<AddEditTransaction />} />
-            <Route path="/accounts" element={<Accounts />} />
-            <Route path="/accounts/add" element={<AddEditAccount />} />
-            <Route path="/accounts/edit/:id" element={<AddEditAccount />} />
-            <Route path="/categories" element={<Categories />} />
-            <Route path="/categories/add" element={<AddEditCategory />} />
-            <Route path="/categories/edit/:id" element={<AddEditCategory />} />
-            <Route path="/budget" element={<Budget />} />
-            <Route path="/budget/add" element={<AddEditBudget />} />
-            <Route path="/budget/edit/:id" element={<AddEditBudget />} />
-            <Route path="/plan" element={<MonthlyPlan />} />
-            <Route path="/plan/add" element={<AddEditPlanItem />} />
-            <Route path="/plan/edit/:id" element={<AddEditPlanItem />} />
-            <Route path="/reports" element={<Reports />} />
-            <Route path="/settings" element={<Settings />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            <Route path="/transactions" element={<ProtectedRoute><Transactions /></ProtectedRoute>} />
+            <Route path="/transactions/add" element={<ProtectedRoute><AddEditTransaction /></ProtectedRoute>} />
+            <Route path="/transactions/edit/:id" element={<ProtectedRoute><AddEditTransaction /></ProtectedRoute>} />
+            <Route path="/accounts" element={<ProtectedRoute><Accounts /></ProtectedRoute>} />
+            <Route path="/accounts/add" element={<ProtectedRoute><AddEditAccount /></ProtectedRoute>} />
+            <Route path="/accounts/edit/:id" element={<ProtectedRoute><AddEditAccount /></ProtectedRoute>} />
+            <Route path="/categories" element={<ProtectedRoute><Categories /></ProtectedRoute>} />
+            <Route path="/categories/add" element={<ProtectedRoute><AddEditCategory /></ProtectedRoute>} />
+            <Route path="/categories/edit/:id" element={<ProtectedRoute><AddEditCategory /></ProtectedRoute>} />
+            <Route path="/budget" element={<ProtectedRoute><Budget /></ProtectedRoute>} />
+            <Route path="/budget/add" element={<ProtectedRoute><AddEditBudget /></ProtectedRoute>} />
+            <Route path="/budget/edit/:id" element={<ProtectedRoute><AddEditBudget /></ProtectedRoute>} />
+            <Route path="/plan" element={<ProtectedRoute><MonthlyPlan /></ProtectedRoute>} />
+            <Route path="/plan/add" element={<ProtectedRoute><AddEditPlanItem /></ProtectedRoute>} />
+            <Route path="/plan/edit/:id" element={<ProtectedRoute><AddEditPlanItem /></ProtectedRoute>} />
+            <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
+            <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
           </Routes>
         </Box>
       </Router>

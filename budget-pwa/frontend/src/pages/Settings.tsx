@@ -1,19 +1,23 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Box, Typography, List, ListItem, ListItemText, ListItemIcon,
-  Switch, Divider, Select, MenuItem, FormControl, InputLabel,
+  Switch, Divider, Select, MenuItem, FormControl, InputLabel, Button,
 } from '@mui/material';
 import {
   Palette as PaletteIcon, Storage as StorageIcon,
-  Info as InfoIcon,
+  Info as InfoIcon, Person as PersonIcon,
 } from '@mui/icons-material';
 import Layout from '../components/Layout';
 import { useThemeMode } from '../context/ThemeContext';
+import { useAuth } from '../context/AuthContext';
 
 const CURRENCIES = ['USD', 'EUR', 'GBP', 'PLN', 'JPY', 'CAD', 'AUD', 'CHF', 'CNY'];
 
 const Settings = () => {
   const { isDark, toggleTheme } = useThemeMode();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [currency, setCurrency] = React.useState(
     () => localStorage.getItem('display-currency') ?? 'USD'
   );
@@ -23,10 +27,33 @@ const Settings = () => {
     localStorage.setItem('display-currency', value);
   };
 
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+
   return (
     <Layout title="Settings">
       <Box p={2}>
         <Typography variant="titleMedium" sx={{ mb: 2, display: 'block' }}>
+          Account
+        </Typography>
+        <SettingsCard>
+          <List disablePadding>
+            <ListItem>
+              <ListItemIcon><PersonIcon /></ListItemIcon>
+              <ListItemText
+                primary={user?.displayName ?? 'Unknown'}
+                secondary={user?.email ?? ''}
+              />
+              <Button variant="outlined" color="error" onClick={handleLogout} size="small">
+                Sign out
+              </Button>
+            </ListItem>
+          </List>
+        </SettingsCard>
+
+        <Typography variant="titleMedium" sx={{ mt: 4, mb: 2, display: 'block' }}>
           Appearance
         </Typography>
         <SettingsCard>
