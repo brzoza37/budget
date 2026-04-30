@@ -2,18 +2,21 @@ import React, { useState, useMemo } from 'react';
 import {
   Box, Typography, Card, CardContent, IconButton, Fab,
   CircularProgress, Stack, Drawer, ToggleButtonGroup, ToggleButton,
-  Button,
+  Button, Snackbar, Alert,
 } from '@mui/material';
 import {
   Add as AddIcon, FilterList as FilterIcon,
   TrendingUp as IncomeIcon, TrendingDown as ExpenseIcon,
   ArrowForward as TransferIcon, Delete as DeleteIcon,
+  FileDownload as DownloadIcon,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
 import { useTransactions, useDeleteTransaction } from '../hooks/useApi';
 import { formatAmount } from '../utils/formatAmount';
 import type { Transaction } from '../types/api';
+import apiClient from '../api/apiClient';
+import { exportToCsv } from '../utils/exportToCsv';
 
 type TypeFilter = 'ALL' | 'INCOME' | 'EXPENSE' | 'TRANSFER';
 
@@ -27,6 +30,29 @@ const Transactions = () => {
 
   const { data: transactions, isLoading } = useTransactions(params);
   const deleteMutation = useDeleteTransaction();
+
+  const [exporting, setExporting] = useState(false);
+  const [exportError, setExportError] = useState('');
+  const [exportSnack, setExportSnack] = useState('');
+
+  const handleExport = async () => {
+    setExporting(true);
+    setExportError('');
+    try {
+      const exportParams = { ...params, itemsPerPage: 1000 };
+      const { data } = await apiClient.get<{ 'hydra:member': Transaction[] }>('/transactions', { params: exportParams });
+      const txs = data['hydra:member'];
+      if (txs.length === 0) {
+        setExportSnack('No transactions to export');
+        return;
+      }
+      exportToCsv(txs);
+    } catch {
+      setExportError('Export failed. Please try again.');
+    } finally {
+      setExporting(false);
+    }
+  };
 
   const grouped = useMemo(() => {
     if (!transactions) return [];
@@ -62,11 +88,27 @@ const Transactions = () => {
     <Layout
       title="Transactions"
       actions={
-        <IconButton onClick={() => setFilterOpen(true)}>
-          <FilterIcon color={typeFilter !== 'ALL' ? 'primary' : 'inherit'} />
-        </IconButton>
+        <Box display="flex" gap={1}>
+          <IconButton onClick={handleExport} disabled={exporting} title="Export CSV">
+            {exporting ? <CircularProgress size={20} /> : <DownloadIcon />}
+          </IconButton>
+          <IconButton onClick={() => setFilterOpen(true)}>
+            <FilterIcon color={typeFilter !== 'ALL' ? 'primary' : 'inherit'} />
+          </IconButton>
+        </Box>
       }
     >
+      {exportError && (
+        <Alert severity="error" onClose={() => setExportError('')} sx={{ mx: 2, mt: 1 }}>
+          {exportError}
+        </Alert>
+      )}
+      <Snackbar
+        open={!!exportSnack}
+        autoHideDuration={3000}
+        onClose={() => setExportSnack('')}
+        message={exportSnack}
+      />
       <Box p={2}>
         {typeFilter !== 'ALL' && (
           <Box mb={1}>
