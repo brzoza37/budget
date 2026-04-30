@@ -4,4 +4,5 @@ budget-pwa/frontend/node_modules/
 budget-pwa/frontend/dist/
 budget-pwa/.idea/
 .superpowers/
+.worktrees/
 *.lock
