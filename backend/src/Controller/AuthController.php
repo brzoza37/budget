@@ -93,7 +93,7 @@ class AuthController extends AbstractController
         if (array_key_exists('locale', $data)) {
             $locale = (string) $data['locale'];
             if (!in_array($locale, self::SUPPORTED_LOCALES, true)) {
-                return $this->json(['error' => 'Invalid locale. Supported: en, pl'], Response::HTTP_BAD_REQUEST);
+                return $this->json(['error' => $this->translator->trans('error.auth.invalid_locale')], Response::HTTP_BAD_REQUEST);
             }
             $user->setLocale($locale);
         }
