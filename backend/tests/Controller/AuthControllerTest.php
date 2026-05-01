@@ -380,4 +380,33 @@ class AuthControllerTest extends WebTestCase
         );
         $this->assertResponseStatusCodeSame(400);
     }
+
+    public function testRegisterCreatesDefaultCategories(): void
+    {
+        $client = static::createClient();
+        $this->jsonPost($client, '/api/auth/register', [
+            'email' => 'defaults@example.com',
+            'password' => self::VALID_PASSWORD,
+            'displayName' => 'Default User',
+        ]);
+        $this->assertResponseStatusCodeSame(201);
+        $token = json_decode($client->getResponse()->getContent(), true)['token'];
+
+        $client->request(
+            'GET', '/api/categories', [], [],
+            ['HTTP_AUTHORIZATION' => "Bearer $token"]
+        );
+        $this->assertResponseIsSuccessful();
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $members = $data['hydra:member'];
+        $this->assertCount(2, $members);
+
+        $names = array_column($members, 'name');
+        $this->assertContains('General', $names);
+        $this->assertContains('Salary', $names);
+
+        $types = array_column($members, 'type');
+        $this->assertContains('EXPENSE', $types);
+        $this->assertContains('INCOME', $types);
+    }
 }

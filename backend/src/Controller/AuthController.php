@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Category;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
@@ -60,6 +61,24 @@ class AuthController extends AbstractController
         $user->setLocale($locale);
 
         $em->persist($user);
+
+        $generalCategory = (new Category())
+            ->setName('General')
+            ->setType('EXPENSE')
+            ->setColor('#9E9E9E')
+            ->setIcon('category')
+            ->setUser($user);
+
+        $salaryCategory = (new Category())
+            ->setName('Salary')
+            ->setType('INCOME')
+            ->setColor('#4CAF50')
+            ->setIcon('payments')
+            ->setUser($user);
+
+        $em->persist($generalCategory);
+        $em->persist($salaryCategory);
+
         $em->flush();
 
         return $this->json([
