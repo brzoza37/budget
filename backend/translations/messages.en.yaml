@@ -5,6 +5,7 @@ error:
         invalid_email: 'Invalid email address'
         password_too_weak: 'Password must be at least 12 characters and contain an uppercase letter, a number, and a special character'
         email_taken: 'Email already registered'
+        invalid_theme: 'Invalid theme. Supported: forest, ocean, aubergine, sunset, slate, rose'
     plan:
         item_not_found: 'PlannedItem not found'
         account_not_found: 'Account not found'

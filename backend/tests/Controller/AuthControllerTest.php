@@ -274,4 +274,72 @@ class AuthControllerTest extends WebTestCase
         $data = json_decode($client->getResponse()->getContent(), true);
         $this->assertEquals('Nieprawidłowy adres e-mail', $data['error']);
     }
+
+    public function testRegisterDefaultThemeIsForest(): void
+    {
+        $client = static::createClient();
+        $this->jsonPost($client, '/api/auth/register', [
+            'email' => 'theme@example.com',
+            'password' => self::VALID_PASSWORD,
+            'displayName' => 'Theme User',
+        ]);
+        $this->assertResponseStatusCodeSame(201);
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals('forest', $data['user']['theme']);
+    }
+
+    public function testLoginResponseIncludesTheme(): void
+    {
+        $client = static::createClient();
+        $this->jsonPost($client, '/api/auth/register', [
+            'email' => 'themelogin@example.com',
+            'password' => self::VALID_PASSWORD,
+            'displayName' => 'Theme Login',
+        ]);
+        $this->jsonPost($client, '/api/auth/login', [
+            'email' => 'themelogin@example.com',
+            'password' => self::VALID_PASSWORD,
+        ]);
+        $this->assertResponseIsSuccessful();
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals('forest', $data['user']['theme']);
+    }
+
+    public function testPatchMeUpdatesTheme(): void
+    {
+        $client = static::createClient();
+        $this->jsonPost($client, '/api/auth/register', [
+            'email' => 'themepatch@example.com',
+            'password' => self::VALID_PASSWORD,
+            'displayName' => 'Theme Patch',
+        ]);
+        $token = json_decode($client->getResponse()->getContent(), true)['token'];
+
+        $client->request(
+            'PATCH', '/api/auth/me', [], [],
+            ['CONTENT_TYPE' => 'application/json', 'HTTP_AUTHORIZATION' => "Bearer $token"],
+            json_encode(['theme' => 'ocean'])
+        );
+        $this->assertResponseIsSuccessful();
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals('ocean', $data['theme']);
+    }
+
+    public function testPatchMeRejectsInvalidTheme(): void
+    {
+        $client = static::createClient();
+        $this->jsonPost($client, '/api/auth/register', [
+            'email' => 'themebad@example.com',
+            'password' => self::VALID_PASSWORD,
+            'displayName' => 'Theme Bad',
+        ]);
+        $token = json_decode($client->getResponse()->getContent(), true)['token'];
+
+        $client->request(
+            'PATCH', '/api/auth/me', [], [],
+            ['CONTENT_TYPE' => 'application/json', 'HTTP_AUTHORIZATION' => "Bearer $token"],
+            json_encode(['theme' => 'neon-rainbow'])
+        );
+        $this->assertResponseStatusCodeSame(400);
+    }
 }

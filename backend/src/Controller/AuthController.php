@@ -16,6 +16,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class AuthController extends AbstractController
 {
     private const SUPPORTED_LOCALES = ['en', 'pl'];
+    private const SUPPORTED_THEMES  = ['forest', 'ocean', 'aubergine', 'sunset', 'slate', 'rose'];
 
     public function __construct(private readonly TranslatorInterface $translator) {}
 
@@ -97,6 +98,14 @@ class AuthController extends AbstractController
             $user->setLocale($locale);
         }
 
+        if (array_key_exists('theme', $data)) {
+            $theme = (string) $data['theme'];
+            if (!in_array($theme, self::SUPPORTED_THEMES, true)) {
+                return $this->json(['error' => $this->translator->trans('error.auth.invalid_theme')], Response::HTTP_BAD_REQUEST);
+            }
+            $user->setTheme($theme);
+        }
+
         $em->flush();
 
         return $this->json($this->userPayload($user));
@@ -110,6 +119,7 @@ class AuthController extends AbstractController
             'displayName' => $user->getDisplayName(),
             'currency'    => $user->getCurrency(),
             'locale'      => $user->getLocale(),
+            'theme'       => $user->getTheme(),
         ];
     }
 }
