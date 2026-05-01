@@ -1,37 +1,38 @@
-import React, { createContext, useContext, useState, useMemo, useCallback } from 'react';
+import React, { createContext, useContext, useState, useMemo, useCallback, useEffect } from 'react';
 import { ThemeProvider } from '@mui/material/styles';
-import { lightTheme, darkTheme } from '../theme/theme';
+import { THEMES } from '../theme/theme';
+import { useAuth } from './AuthContext';
 
 interface ThemeContextValue {
-  isDark: boolean;
-  toggleTheme: () => void;
+  themeName: string;
+  setThemeName: (name: string) => void;
 }
 
 const ThemeContext = createContext<ThemeContextValue>({
-  isDark: false,
-  toggleTheme: () => {},
+  themeName: 'forest',
+  setThemeName: () => {},
 });
 
 export const useThemeMode = () => useContext(ThemeContext);
 
 export const AppThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [isDark, setIsDark] = useState<boolean>(() => {
-    return localStorage.getItem('theme-mode') === 'dark';
-  });
+  const { user } = useAuth();
+  const [themeName, setThemeNameState] = useState<string>(user?.theme ?? 'forest');
 
-  const toggleTheme = useCallback(() => {
-    setIsDark((prev) => {
-      const next = !prev;
-      localStorage.setItem('theme-mode', next ? 'dark' : 'light');
-      return next;
-    });
+  useEffect(() => {
+    setThemeNameState(user?.theme ?? 'forest');
+  }, [user?.theme]);
+
+  const setThemeName = useCallback((name: string) => {
+    setThemeNameState(THEMES[name] ? name : 'forest');
   }, []);
 
-  const value = useMemo(() => ({ isDark, toggleTheme }), [isDark, toggleTheme]);
+  const value = useMemo(() => ({ themeName, setThemeName }), [themeName, setThemeName]);
+  const activeTheme = THEMES[themeName] ?? THEMES.forest;
 
   return (
     <ThemeContext.Provider value={value}>
-      <ThemeProvider theme={isDark ? darkTheme : lightTheme}>
+      <ThemeProvider theme={activeTheme}>
         {children}
       </ThemeProvider>
     </ThemeContext.Provider>
