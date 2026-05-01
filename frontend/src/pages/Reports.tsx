@@ -10,6 +10,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid,
 } from 'recharts';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '../context/AuthContext';
 import Layout from '../components/Layout';
 import { useTransactions, useMonthlyTrend } from '../hooks/useApi';
 import { formatAmount } from '../utils/formatAmount';
@@ -18,6 +19,7 @@ const COLORS = ['#4CAF50', '#FF5722', '#2196F3', '#FF9800', '#9C27B0', '#00BCD4'
 
 const Reports = () => {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const [viewDate, setViewDate] = useState(new Date());
   const month = viewDate.getMonth() + 1;
   const year = viewDate.getFullYear();
@@ -47,7 +49,7 @@ const Reports = () => {
 
   const pieData = Object.values(categorySpend ?? {}).sort((a, b) => b.value - a.value);
   const totalExpense = pieData.reduce((s, d) => s + d.value, 0);
-  const currency = 'USD';
+  const currency = user?.currency ?? 'USD';
 
   const barData = trend?.map((item) => ({
     name: item.month,

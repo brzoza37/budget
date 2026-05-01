@@ -17,6 +17,7 @@ import {
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '../context/AuthContext';
 import Layout from '../components/Layout';
 import ConfirmSheet from '../components/ConfirmSheet';
 import {
@@ -30,6 +31,8 @@ import type { PlannedItem } from '../types/api';
 
 const MonthlyPlan = () => {
   const { t } = useTranslation();
+  const { user } = useAuth();
+  const userCurrency = user?.currency ?? 'USD';
   const navigate = useNavigate();
   const [viewDate, setViewDate] = useState(new Date());
   const month = viewDate.getMonth() + 1;
@@ -107,6 +110,7 @@ const MonthlyPlan = () => {
                   onConfirm={() => setConfirmItem(item)}
                   onDelete={() => setDeleteItem(item)}
                   onClick={() => navigate(`/plan/edit/${item.id}`)}
+                  userCurrency={userCurrency}
                 />
               ))}
             </Stack>
@@ -127,6 +131,7 @@ const MonthlyPlan = () => {
                   onConfirm={() => setConfirmItem(item)}
                   onDelete={() => setDeleteItem(item)}
                   onClick={() => navigate(`/plan/edit/${item.id}`)}
+                  userCurrency={userCurrency}
                 />
               ))}
             </Stack>
@@ -170,16 +175,17 @@ const MonthlyPlan = () => {
 };
 
 const PlanItemRow = ({
-  item, onConfirm, onDelete, onClick,
+  item, onConfirm, onDelete, onClick, userCurrency,
 }: {
   item: PlannedItem;
   onConfirm: () => void;
   onDelete: () => void;
   onClick: () => void;
+  userCurrency: string;
 }) => {
   const { t } = useTranslation();
   const isPartial = !item.isPaid && (item.paidAmount ?? 0) > 0;
-  const currency = item.account?.currency ?? 'USD';
+  const currency = item.account?.currency ?? userCurrency;
 
   return (
     <Card

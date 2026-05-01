@@ -10,6 +10,7 @@ import {
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '../context/AuthContext';
 import Layout from '../components/Layout';
 import { useAccounts, useTransactions, useStatsSummary } from '../hooks/useApi';
 import { formatAmount } from '../utils/formatAmount';
@@ -17,6 +18,7 @@ import type { Account, Transaction } from '../types/api';
 
 const Dashboard = () => {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const now = new Date();
   const { data: accounts, isLoading: accountsLoading } = useAccounts();
@@ -41,7 +43,7 @@ const Dashboard = () => {
     );
   }
 
-  const userCurrency = accounts?.[0]?.currency ?? 'USD';
+  const userCurrency = user?.currency ?? 'USD';
 
   return (
     <Layout
@@ -136,7 +138,7 @@ const Dashboard = () => {
             </Typography>
           )}
           {transactions?.map((transaction) => (
-            <TransactionItem key={transaction.id} transaction={transaction} />
+            <TransactionItem key={transaction.id} transaction={transaction} userCurrency={userCurrency} />
           ))}
         </Stack>
       </Box>
@@ -205,11 +207,11 @@ const AccountChip = ({ account }: { account: Account }) => (
   </Card>
 );
 
-const TransactionItem = ({ transaction }: { transaction: Transaction }) => {
+const TransactionItem = ({ transaction, userCurrency }: { transaction: Transaction; userCurrency: string }) => {
   const color = transaction.type === 'INCOME' ? '#2E7D32'
     : transaction.type === 'TRANSFER' ? '#1565C0' : '#C62828';
   const prefix = transaction.type === 'INCOME' ? '+' : transaction.type === 'EXPENSE' ? '-' : '';
-  const currency = transaction.account?.currency ?? 'USD';
+  const currency = transaction.account?.currency ?? userCurrency;
 
   return (
     <Card variant="outlined" sx={{ border: 'none', bgcolor: 'background.paper' }}>

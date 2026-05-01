@@ -4,12 +4,15 @@ import {
 } from '@mui/material';
 import { Add as AddIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import Layout from '../components/Layout';
 import { useBudgets, useDeleteBudget } from '../hooks/useApi';
 import { formatAmount } from '../utils/formatAmount';
 import type { Budget } from '../types/api';
 
 const Budget = () => {
+  const { user } = useAuth();
+  const userCurrency = user?.currency ?? 'USD';
   const navigate = useNavigate();
   const { data: budgets, isLoading } = useBudgets();
   const deleteMutation = useDeleteBudget();
@@ -44,6 +47,7 @@ const Budget = () => {
             <BudgetItem
               key={budget.id}
               budget={budget}
+              userCurrency={userCurrency}
               onClick={() => navigate(`/budget/edit/${budget.id}`)}
               onDelete={() => handleDelete(budget)}
             />
@@ -63,15 +67,15 @@ const Budget = () => {
 };
 
 const BudgetItem = ({
-  budget, onClick, onDelete,
+  budget, onClick, onDelete, userCurrency,
 }: {
-  budget: Budget; onClick: () => void; onDelete: () => void;
+  budget: Budget; onClick: () => void; onDelete: () => void; userCurrency: string;
 }) => {
   const spent = budget.spent ?? 0;
   const progress = budget.amount > 0 ? Math.min((spent / budget.amount) * 100, 100) : 0;
   const isOverBudget = spent > budget.amount;
   const categoryColor = budget.category?.color ?? '#9e9e9e';
-  const currency = 'USD';
+  const currency = userCurrency;
 
   return (
     <Box>

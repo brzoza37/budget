@@ -12,6 +12,7 @@ import {
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '../context/AuthContext';
 import Layout from '../components/Layout';
 import { useTransactions, useDeleteTransaction } from '../hooks/useApi';
 import { formatAmount } from '../utils/formatAmount';
@@ -23,6 +24,8 @@ type TypeFilter = 'ALL' | 'INCOME' | 'EXPENSE' | 'TRANSFER';
 
 const Transactions = () => {
   const { t } = useTranslation();
+  const { user } = useAuth();
+  const userCurrency = user?.currency ?? 'USD';
   const navigate = useNavigate();
   const [filterOpen, setFilterOpen] = useState(false);
   const [typeFilter, setTypeFilter] = useState<TypeFilter>('ALL');
@@ -72,7 +75,7 @@ const Transactions = () => {
 
   const handleDelete = async (tx: Transaction) => {
     if (!tx.id) return;
-    if (window.confirm(t('transactions.deleteConfirm', { amount: formatAmount(tx.amount, tx.account?.currency ?? 'USD') }))) {
+    if (window.confirm(t('transactions.deleteConfirm', { amount: formatAmount(tx.amount, tx.account?.currency ?? userCurrency) }))) {
       await deleteMutation.mutateAsync(String(tx.id));
     }
   };
@@ -143,6 +146,7 @@ const Transactions = () => {
                     <TransactionListItem
                       key={tx.id}
                       transaction={tx}
+                      userCurrency={userCurrency}
                       onClick={() => navigate(`/transactions/edit/${tx.id}`)}
                       onDelete={() => handleDelete(tx)}
                     />
@@ -181,14 +185,14 @@ const Transactions = () => {
 };
 
 const TransactionListItem = ({
-  transaction, onClick, onDelete,
+  transaction, onClick, onDelete, userCurrency,
 }: {
-  transaction: Transaction; onClick: () => void; onDelete: () => void;
+  transaction: Transaction; onClick: () => void; onDelete: () => void; userCurrency: string;
 }) => {
   const color = transaction.type === 'INCOME' ? '#2E7D32'
     : transaction.type === 'TRANSFER' ? '#1565C0' : '#C62828';
   const prefix = transaction.type === 'INCOME' ? '+' : transaction.type === 'EXPENSE' ? '-' : '';
-  const currency = transaction.account?.currency ?? 'USD';
+  const currency = transaction.account?.currency ?? userCurrency;
 
   return (
     <Card

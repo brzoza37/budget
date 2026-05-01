@@ -5,6 +5,7 @@ import {
   InputLabel, ToggleButton, ToggleButtonGroup, Typography, Stack,
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '../context/AuthContext';
 import { useAccounts } from '../hooks/useApi';
 import type { PlannedItem } from '../types/api';
 import { formatAmount } from '../utils/formatAmount';
@@ -19,6 +20,7 @@ interface Props {
 
 const ConfirmSheet = ({ item, open, onClose, onConfirm, isLoading }: Props) => {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const { data: accounts } = useAccounts();
   const [mode, setMode] = useState<'full' | 'partial'>('full');
   const [partialAmount, setPartialAmount] = useState('');
@@ -27,6 +29,7 @@ const ConfirmSheet = ({ item, open, onClose, onConfirm, isLoading }: Props) => {
 
   if (!item) return null;
 
+  const itemCurrency = item.account?.currency ?? user?.currency ?? 'USD';
   const alreadyPaid = item.paidAmount ?? 0;
   const remaining = item.amount - alreadyPaid;
   const confirmAmount = mode === 'full' ? remaining : parseFloat(partialAmount || '0');
@@ -43,8 +46,8 @@ const ConfirmSheet = ({ item, open, onClose, onConfirm, isLoading }: Props) => {
       <DialogContent>
         <Stack spacing={2} mt={1}>
           <Typography variant="body2" color="text.secondary">
-            {item.name} — planned {formatAmount(item.amount, 'USD')}
-            {alreadyPaid > 0 && ` ${t('plan.alreadyPaid', { amount: formatAmount(alreadyPaid, 'USD') })}`}
+            {item.name} — planned {formatAmount(item.amount, itemCurrency)}
+            {alreadyPaid > 0 && ` ${t('plan.alreadyPaid', { amount: formatAmount(alreadyPaid, itemCurrency) })}`}
           </Typography>
 
           <ToggleButtonGroup
@@ -54,7 +57,7 @@ const ConfirmSheet = ({ item, open, onClose, onConfirm, isLoading }: Props) => {
             size="small"
             fullWidth
           >
-            <ToggleButton value="full">{t('plan.fullAmount', { amount: formatAmount(remaining, 'USD') })}</ToggleButton>
+            <ToggleButton value="full">{t('plan.fullAmount', { amount: formatAmount(remaining, itemCurrency) })}</ToggleButton>
             <ToggleButton value="partial">{t('plan.partial')}</ToggleButton>
           </ToggleButtonGroup>
 
