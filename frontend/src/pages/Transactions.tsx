@@ -5,7 +5,7 @@ import {
   Button, Snackbar, Alert,
 } from '@mui/material';
 import {
-  Add as AddIcon, FilterList as FilterIcon,
+  Add as AddIcon, FilterList as FilterIcon, Sell as CategoriesIcon,
   TrendingUp as IncomeIcon, TrendingDown as ExpenseIcon,
   ArrowForward as TransferIcon, Delete as DeleteIcon,
   FileDownload as DownloadIcon,
@@ -95,6 +95,9 @@ const Transactions = () => {
       title={t('transactions.title')}
       actions={
         <Box display="flex" gap={1}>
+          <IconButton onClick={() => navigate('/categories')} aria-label="Manage categories">
+            <CategoriesIcon />
+          </IconButton>
           <IconButton onClick={handleExport} disabled={exporting} title={t('transactions.exportCsv')} aria-label={t('transactions.exportCsv')}>
             {exporting ? <CircularProgress size={20} /> : <DownloadIcon />}
           </IconButton>
