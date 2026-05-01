@@ -1,4 +1,5 @@
 import { createTheme, Theme } from '@mui/material/styles';
+import React from 'react';
 
 const sharedTypography = {
   fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
@@ -23,7 +24,7 @@ const sharedComponents = {
   },
 };
 
-export const lightTheme: Theme = createTheme({
+const forestTheme = createTheme({
   palette: {
     mode: 'light',
     primary: { main: '#4CAF50', contrastText: '#ffffff' },
@@ -35,19 +36,83 @@ export const lightTheme: Theme = createTheme({
   components: sharedComponents,
 });
 
-export const darkTheme: Theme = createTheme({
+const oceanTheme = createTheme({
   palette: {
     mode: 'dark',
-    primary: { main: '#66BB6A', contrastText: '#000000' },
-    secondary: { main: '#FF7043' },
-    background: { default: '#121212', paper: '#1e1e1e' },
+    primary: { main: '#1E88E5', contrastText: '#ffffff' },
+    secondary: { main: '#00ACC1' },
+    background: { default: '#0d1b2a', paper: '#1a2a3a' },
   },
   typography: sharedTypography,
   shape: { borderRadius: 12 },
   components: sharedComponents,
 });
 
-export const theme = lightTheme;
+const aubergineTheme = createTheme({
+  palette: {
+    mode: 'dark',
+    primary: { main: '#AB47BC', contrastText: '#ffffff' },
+    secondary: { main: '#7B1FA2' },
+    background: { default: '#1a0a1e', paper: '#2a1a35' },
+  },
+  typography: sharedTypography,
+  shape: { borderRadius: 12 },
+  components: sharedComponents,
+});
+
+const sunsetTheme = createTheme({
+  palette: {
+    mode: 'light',
+    primary: { main: '#FB8C00', contrastText: '#ffffff' },
+    secondary: { main: '#E53935' },
+    background: { default: '#fff8f0', paper: '#ffffff' },
+  },
+  typography: sharedTypography,
+  shape: { borderRadius: 12 },
+  components: sharedComponents,
+});
+
+const slateTheme = createTheme({
+  palette: {
+    mode: 'dark',
+    primary: { main: '#78909C', contrastText: '#ffffff' },
+    secondary: { main: '#546E7A' },
+    background: { default: '#1a1f23', paper: '#242c32' },
+  },
+  typography: sharedTypography,
+  shape: { borderRadius: 12 },
+  components: sharedComponents,
+});
+
+const roseTheme = createTheme({
+  palette: {
+    mode: 'light',
+    primary: { main: '#E91E63', contrastText: '#ffffff' },
+    secondary: { main: '#FF4081' },
+    background: { default: '#fff0f5', paper: '#ffffff' },
+  },
+  typography: sharedTypography,
+  shape: { borderRadius: 12 },
+  components: sharedComponents,
+});
+
+export const THEMES: Record<string, Theme> = {
+  forest: forestTheme,
+  ocean: oceanTheme,
+  aubergine: aubergineTheme,
+  sunset: sunsetTheme,
+  slate: slateTheme,
+  rose: roseTheme,
+};
+
+export const THEME_META: { id: string; primary: string; labelKey: string }[] = [
+  { id: 'forest',    primary: '#4CAF50', labelKey: 'settings.themes.forest' },
+  { id: 'ocean',     primary: '#1E88E5', labelKey: 'settings.themes.ocean' },
+  { id: 'aubergine', primary: '#AB47BC', labelKey: 'settings.themes.aubergine' },
+  { id: 'sunset',    primary: '#FB8C00', labelKey: 'settings.themes.sunset' },
+  { id: 'slate',     primary: '#78909C', labelKey: 'settings.themes.slate' },
+  { id: 'rose',      primary: '#E91E63', labelKey: 'settings.themes.rose' },
+];
 
 declare module '@mui/material/styles' {
   interface TypographyVariants {
