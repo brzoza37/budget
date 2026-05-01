@@ -25,18 +25,31 @@ const Settings = () => {
   const { themeName, setThemeName } = useThemeMode();
   const navigate = useNavigate();
 
-  const [currency, setCurrency] = React.useState(
-    () => localStorage.getItem('display-currency') ?? 'USD'
-  );
+  const [currency, setCurrency] = React.useState<string>(user?.currency ?? 'USD');
+  const [savingCurrency, setSavingCurrency] = React.useState(false);
+  const [currencyError, setCurrencyError] = React.useState('');
   const [locale, setLocale] = React.useState<string>(user?.locale ?? 'en');
   const [savingLocale, setSavingLocale] = React.useState(false);
   const [localeError, setLocaleError] = React.useState('');
   const [savingTheme, setSavingTheme] = React.useState(false);
   const [themeError, setThemeError] = React.useState('');
 
-  const handleCurrencyChange = (value: string) => {
+  const handleCurrencyChange = async (value: string) => {
+    if (value === currency) return;
+    const previous = currency;
     setCurrency(value);
-    localStorage.setItem('display-currency', value);
+    setSavingCurrency(true);
+    try {
+      await apiClient.patch('/auth/me', { currency: value }, {
+        headers: { 'Content-Type': 'application/json' },
+      });
+      updateUser({ currency: value });
+    } catch {
+      setCurrency(previous);
+      setCurrencyError(t('settings.currencyError'));
+    } finally {
+      setSavingCurrency(false);
+    }
   };
 
   const handleLocaleChange = async (_: React.MouseEvent, newLocale: string | null) => {
@@ -158,7 +171,7 @@ const Settings = () => {
         </Typography>
         <SettingsCard>
           <Box p={2}>
-            <FormControl fullWidth size="small">
+            <FormControl fullWidth size="small" disabled={savingCurrency}>
               <InputLabel>{t('settings.displayCurrency')}</InputLabel>
               <Select
                 value={currency}
@@ -196,6 +209,9 @@ const Settings = () => {
       </Snackbar>
       <Snackbar open={!!themeError} autoHideDuration={4000} onClose={() => setThemeError('')}>
         <Alert severity="error" onClose={() => setThemeError('')}>{themeError}</Alert>
+      </Snackbar>
+      <Snackbar open={!!currencyError} autoHideDuration={4000} onClose={() => setCurrencyError('')}>
+        <Alert severity="error" onClose={() => setCurrencyError('')}>{currencyError}</Alert>
       </Snackbar>
     </Layout>
   );

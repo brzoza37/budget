@@ -15,8 +15,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class AuthController extends AbstractController
 {
-    private const SUPPORTED_LOCALES = ['en', 'pl'];
-    private const SUPPORTED_THEMES  = ['forest', 'ocean', 'aubergine', 'sunset', 'slate', 'rose'];
+    private const SUPPORTED_LOCALES    = ['en', 'pl'];
+    private const SUPPORTED_THEMES     = ['forest', 'ocean', 'aubergine', 'sunset', 'slate', 'rose'];
+    private const SUPPORTED_CURRENCIES = ['USD', 'EUR', 'GBP', 'PLN', 'JPY', 'CAD', 'AUD', 'CHF', 'CNY'];
 
     public function __construct(private readonly TranslatorInterface $translator) {}
 
@@ -104,6 +105,14 @@ class AuthController extends AbstractController
                 return $this->json(['error' => $this->translator->trans('error.auth.invalid_theme', ['%themes%' => implode(', ', self::SUPPORTED_THEMES)])], Response::HTTP_BAD_REQUEST);
             }
             $user->setTheme($theme);
+        }
+
+        if (array_key_exists('currency', $data)) {
+            $currency = (string) $data['currency'];
+            if (!in_array($currency, self::SUPPORTED_CURRENCIES, true)) {
+                return $this->json(['error' => $this->translator->trans('error.auth.invalid_currency', ['%currencies%' => implode(', ', self::SUPPORTED_CURRENCIES)])], Response::HTTP_BAD_REQUEST);
+            }
+            $user->setCurrency($currency);
         }
 
         $em->flush();

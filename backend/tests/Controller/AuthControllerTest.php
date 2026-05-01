@@ -342,4 +342,42 @@ class AuthControllerTest extends WebTestCase
         );
         $this->assertResponseStatusCodeSame(400);
     }
+
+    public function testPatchMeUpdatesCurrency(): void
+    {
+        $client = static::createClient();
+        $this->jsonPost($client, '/api/auth/register', [
+            'email' => 'currencypatch@example.com',
+            'password' => self::VALID_PASSWORD,
+            'displayName' => 'Currency Patch',
+        ]);
+        $token = json_decode($client->getResponse()->getContent(), true)['token'];
+
+        $client->request(
+            'PATCH', '/api/auth/me', [], [],
+            ['CONTENT_TYPE' => 'application/json', 'HTTP_AUTHORIZATION' => "Bearer $token"],
+            json_encode(['currency' => 'EUR'])
+        );
+        $this->assertResponseIsSuccessful();
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals('EUR', $data['currency']);
+    }
+
+    public function testPatchMeRejectsInvalidCurrency(): void
+    {
+        $client = static::createClient();
+        $this->jsonPost($client, '/api/auth/register', [
+            'email' => 'currencybad@example.com',
+            'password' => self::VALID_PASSWORD,
+            'displayName' => 'Currency Bad',
+        ]);
+        $token = json_decode($client->getResponse()->getContent(), true)['token'];
+
+        $client->request(
+            'PATCH', '/api/auth/me', [], [],
+            ['CONTENT_TYPE' => 'application/json', 'HTTP_AUTHORIZATION' => "Bearer $token"],
+            json_encode(['currency' => 'MOON'])
+        );
+        $this->assertResponseStatusCodeSame(400);
+    }
 }

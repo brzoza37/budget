@@ -78,6 +78,8 @@
     },
     "currencySection": "Currency",
     "displayCurrency": "Display Currency",
+    "savingCurrency": "Saving…",
+    "currencyError": "Failed to save currency. Please try again.",
     "dataSupport": "Data & Support",
     "exportData": "Export Data",
     "exportDataDesc": "Coming soon",
