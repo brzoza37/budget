@@ -16,6 +16,7 @@ import {
   TrendingDown as ExpenseIcon,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import Layout from '../components/Layout';
 import ConfirmSheet from '../components/ConfirmSheet';
 import {
@@ -28,6 +29,7 @@ import { formatAmount } from '../utils/formatAmount';
 import type { PlannedItem } from '../types/api';
 
 const MonthlyPlan = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [viewDate, setViewDate] = useState(new Date());
   const month = viewDate.getMonth() + 1;
@@ -65,7 +67,7 @@ const MonthlyPlan = () => {
 
   if (isLoading) {
     return (
-      <Layout title="Monthly Plan">
+      <Layout title={t('plan.title')}>
         <Box display="flex" justifyContent="center" alignItems="center" height="80vh">
           <CircularProgress />
         </Box>
@@ -74,7 +76,7 @@ const MonthlyPlan = () => {
   }
 
   return (
-    <Layout title="Monthly Plan">
+    <Layout title={t('plan.title')}>
       <Box p={2}>
         {/* Month navigator */}
         <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
@@ -87,7 +89,7 @@ const MonthlyPlan = () => {
 
         {incomeItems.length === 0 && expenseItems.length === 0 && (
           <Typography variant="body2" color="text.secondary" align="center" sx={{ mt: 4 }}>
-            No items planned for this month.
+            {t('plan.noItems')}
           </Typography>
         )}
 
@@ -95,7 +97,7 @@ const MonthlyPlan = () => {
         {incomeItems.length > 0 && (
           <>
             <Typography variant="labelMedium" color="success.main" sx={{ display: 'block', mb: 1, textTransform: 'uppercase' }}>
-              Income
+              {t('plan.income')}
             </Typography>
             <Stack spacing={1.5} mb={3}>
               {incomeItems.map((item) => (
@@ -115,7 +117,7 @@ const MonthlyPlan = () => {
         {expenseItems.length > 0 && (
           <>
             <Typography variant="labelMedium" color="text.secondary" sx={{ display: 'block', mb: 1, textTransform: 'uppercase' }}>
-              Expenses
+              {t('plan.expenses')}
             </Typography>
             <Stack spacing={1.5}>
               {expenseItems.map((item) => (
@@ -143,16 +145,16 @@ const MonthlyPlan = () => {
 
       {/* Delete confirm dialog */}
       <Dialog open={!!deleteItem} onClose={() => setDeleteItem(null)}>
-        <DialogTitle>Delete Item</DialogTitle>
+        <DialogTitle>{t('plan.deleteItem')}</DialogTitle>
         <DialogContent>
           <Typography>
-            Delete "{deleteItem?.name}"?
-            {deleteItem?.recurringEvent && ' This will only remove this occurrence.'}
+            {t('plan.deleteItemConfirm', { name: deleteItem?.name })}
+            {deleteItem?.recurringEvent && ` ${t('plan.deleteItemRecurring')}`}
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDeleteItem(null)}>Cancel</Button>
-          <Button color="error" onClick={handleDelete} disabled={deleteMutation.isPending}>Delete</Button>
+          <Button onClick={() => setDeleteItem(null)}>{t('common.cancel')}</Button>
+          <Button color="error" onClick={handleDelete} disabled={deleteMutation.isPending}>{t('common.delete')}</Button>
         </DialogActions>
       </Dialog>
 
@@ -175,6 +177,7 @@ const PlanItemRow = ({
   onDelete: () => void;
   onClick: () => void;
 }) => {
+  const { t } = useTranslation();
   const isPartial = !item.isPaid && (item.paidAmount ?? 0) > 0;
   const currency = item.account?.currency ?? 'USD';
 
@@ -210,7 +213,7 @@ const PlanItemRow = ({
             )}
           </Box>
           <Typography variant="labelSmall" color="text.secondary">
-            Due {new Date(item.dueDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+            {t('plan.due', { date: new Date(item.dueDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) })}
             {item.category?.name && ` • ${item.category.name}`}
             {isPartial && ` • ${formatAmount(item.paidAmount!, currency)} paid`}
           </Typography>

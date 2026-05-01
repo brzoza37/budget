@@ -4,6 +4,7 @@ import {
   Button, TextField, Select, MenuItem, FormControl,
   InputLabel, ToggleButton, ToggleButtonGroup, Typography, Stack,
 } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 import { useAccounts } from '../hooks/useApi';
 import type { PlannedItem } from '../types/api';
 import { formatAmount } from '../utils/formatAmount';
@@ -17,6 +18,7 @@ interface Props {
 }
 
 const ConfirmSheet = ({ item, open, onClose, onConfirm, isLoading }: Props) => {
+  const { t } = useTranslation();
   const { data: accounts } = useAccounts();
   const [mode, setMode] = useState<'full' | 'partial'>('full');
   const [partialAmount, setPartialAmount] = useState('');
@@ -28,7 +30,7 @@ const ConfirmSheet = ({ item, open, onClose, onConfirm, isLoading }: Props) => {
   const alreadyPaid = item.paidAmount ?? 0;
   const remaining = item.amount - alreadyPaid;
   const confirmAmount = mode === 'full' ? remaining : parseFloat(partialAmount || '0');
-  const label = item.type === 'INCOME' ? 'Mark as Received' : 'Mark as Paid';
+  const label = item.type === 'INCOME' ? t('plan.markAsReceived') : t('plan.markAsPaid');
 
   const handleConfirm = () => {
     if (!accountId) return;
@@ -42,7 +44,7 @@ const ConfirmSheet = ({ item, open, onClose, onConfirm, isLoading }: Props) => {
         <Stack spacing={2} mt={1}>
           <Typography variant="body2" color="text.secondary">
             {item.name} — planned {formatAmount(item.amount, 'USD')}
-            {alreadyPaid > 0 && ` (${formatAmount(alreadyPaid, 'USD')} already paid)`}
+            {alreadyPaid > 0 && ` ${t('plan.alreadyPaid', { amount: formatAmount(alreadyPaid, 'USD') })}`}
           </Typography>
 
           <ToggleButtonGroup
@@ -52,13 +54,13 @@ const ConfirmSheet = ({ item, open, onClose, onConfirm, isLoading }: Props) => {
             size="small"
             fullWidth
           >
-            <ToggleButton value="full">Full ({formatAmount(remaining, 'USD')})</ToggleButton>
-            <ToggleButton value="partial">Partial</ToggleButton>
+            <ToggleButton value="full">{t('plan.fullAmount', { amount: formatAmount(remaining, 'USD') })}</ToggleButton>
+            <ToggleButton value="partial">{t('plan.partial')}</ToggleButton>
           </ToggleButtonGroup>
 
           {mode === 'partial' && (
             <TextField
-              label="Amount"
+              label={t('plan.amount')}
               type="number"
               value={partialAmount}
               onChange={(e) => setPartialAmount(e.target.value)}
@@ -69,10 +71,10 @@ const ConfirmSheet = ({ item, open, onClose, onConfirm, isLoading }: Props) => {
           )}
 
           <FormControl fullWidth size="small">
-            <InputLabel>Account</InputLabel>
+            <InputLabel>{t('plan.account')}</InputLabel>
             <Select
               value={accountId}
-              label="Account"
+              label={t('plan.account')}
               onChange={(e) => setAccountId(Number(e.target.value))}
             >
               {accounts?.map((a) => (
@@ -82,7 +84,7 @@ const ConfirmSheet = ({ item, open, onClose, onConfirm, isLoading }: Props) => {
           </FormControl>
 
           <TextField
-            label="Date"
+            label={t('plan.date')}
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
@@ -93,13 +95,13 @@ const ConfirmSheet = ({ item, open, onClose, onConfirm, isLoading }: Props) => {
         </Stack>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} disabled={isLoading}>Cancel</Button>
+        <Button onClick={onClose} disabled={isLoading}>{t('common.cancel')}</Button>
         <Button
           variant="contained"
           onClick={handleConfirm}
           disabled={isLoading || !accountId || (mode === 'partial' && confirmAmount <= 0)}
         >
-          {isLoading ? 'Saving...' : label}
+          {isLoading ? t('plan.saving') : label}
         </Button>
       </DialogActions>
     </Dialog>

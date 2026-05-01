@@ -11,6 +11,7 @@ import {
   FileDownload as DownloadIcon,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import Layout from '../components/Layout';
 import { useTransactions, useDeleteTransaction } from '../hooks/useApi';
 import { formatAmount } from '../utils/formatAmount';
@@ -21,6 +22,7 @@ import { exportToCsv } from '../utils/exportToCsv';
 type TypeFilter = 'ALL' | 'INCOME' | 'EXPENSE' | 'TRANSFER';
 
 const Transactions = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [filterOpen, setFilterOpen] = useState(false);
   const [typeFilter, setTypeFilter] = useState<TypeFilter>('ALL');
@@ -43,13 +45,13 @@ const Transactions = () => {
       const { data } = await apiClient.get<{ 'hydra:member': Transaction[] }>('/transactions', { params: exportParams });
       const txs = data['hydra:member'];
       if (txs.length === 0) {
-        setExportSnack('No transactions to export');
+        setExportSnack(t('transactions.noTransactionsToExport'));
         return;
       }
       exportToCsv(txs);
     } catch (err) {
       console.error('CSV export failed', err);
-      setExportError('Export failed. Please try again.');
+      setExportError(t('transactions.exportFailed'));
     } finally {
       setExporting(false);
     }
@@ -70,14 +72,14 @@ const Transactions = () => {
 
   const handleDelete = async (tx: Transaction) => {
     if (!tx.id) return;
-    if (window.confirm(`Delete this transaction of ${formatAmount(tx.amount, tx.account?.currency ?? 'USD')}?`)) {
+    if (window.confirm(t('transactions.deleteConfirm', { amount: formatAmount(tx.amount, tx.account?.currency ?? 'USD') }))) {
       await deleteMutation.mutateAsync(String(tx.id));
     }
   };
 
   if (isLoading) {
     return (
-      <Layout title="Transactions">
+      <Layout title={t('transactions.title')}>
         <Box display="flex" justifyContent="center" alignItems="center" height="80vh">
           <CircularProgress />
         </Box>
@@ -87,10 +89,10 @@ const Transactions = () => {
 
   return (
     <Layout
-      title="Transactions"
+      title={t('transactions.title')}
       actions={
         <Box display="flex" gap={1}>
-          <IconButton onClick={handleExport} disabled={exporting} title="Export CSV" aria-label="Export CSV">
+          <IconButton onClick={handleExport} disabled={exporting} title={t('transactions.exportCsv')} aria-label={t('transactions.exportCsv')}>
             {exporting ? <CircularProgress size={20} /> : <DownloadIcon />}
           </IconButton>
           <IconButton onClick={() => setFilterOpen(true)}>
@@ -114,7 +116,7 @@ const Transactions = () => {
         {typeFilter !== 'ALL' && (
           <Box mb={1}>
             <Button size="small" onClick={() => setTypeFilter('ALL')} variant="outlined">
-              Clear filter: {typeFilter}
+              {t('transactions.clearFilter', { type: typeFilter })}
             </Button>
           </Box>
         )}
@@ -122,7 +124,7 @@ const Transactions = () => {
         {grouped.length === 0 ? (
           <Box display="flex" justifyContent="center" alignItems="center" height="60vh" textAlign="center">
             <Typography variant="body2" color="text.secondary">
-              No transactions yet.<br />Tap + to add one!
+              {t('transactions.noTransactions')}<br />{t('transactions.addFirst')}
             </Typography>
           </Box>
         ) : (
@@ -162,15 +164,15 @@ const Transactions = () => {
 
       <Drawer anchor="bottom" open={filterOpen} onClose={() => setFilterOpen(false)}>
         <Box p={3}>
-          <Typography variant="titleMedium" mb={2}>Filter by type</Typography>
+          <Typography variant="titleMedium" mb={2}>{t('transactions.filterByType')}</Typography>
           <ToggleButtonGroup
             value={typeFilter} exclusive fullWidth color="primary"
             onChange={(_, v) => { if (v) { setTypeFilter(v); setFilterOpen(false); } }}
           >
-            <ToggleButton value="ALL">All</ToggleButton>
-            <ToggleButton value="INCOME">Income</ToggleButton>
-            <ToggleButton value="EXPENSE">Expense</ToggleButton>
-            <ToggleButton value="TRANSFER">Transfer</ToggleButton>
+            <ToggleButton value="ALL">{t('transactions.all')}</ToggleButton>
+            <ToggleButton value="INCOME">{t('transactions.income')}</ToggleButton>
+            <ToggleButton value="EXPENSE">{t('transactions.expense')}</ToggleButton>
+            <ToggleButton value="TRANSFER">{t('transactions.transfer')}</ToggleButton>
           </ToggleButtonGroup>
         </Box>
       </Drawer>
