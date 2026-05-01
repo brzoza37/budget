@@ -32,6 +32,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 5)]
     private string $locale = 'en';
 
+    #[ORM\Column(length: 30)]
+    private string $theme = 'forest';
+
     #[ORM\Column(type: 'json')]
     private array $roles = [];
 
@@ -69,6 +72,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getLocale(): string { return $this->locale; }
     public function setLocale(string $locale): static { $this->locale = $locale; return $this; }
+
+    public function getTheme(): string { return $this->theme; }
+    public function setTheme(string $theme): static { $this->theme = $theme; return $this; }
 
     public function getCreatedAt(): ?\DateTimeImmutable { return $this->createdAt; }
 
