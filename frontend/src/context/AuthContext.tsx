@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import i18next from 'i18next';
 import { AuthUser } from '../types/api';
 
 interface AuthContextValue {
@@ -7,6 +8,7 @@ interface AuthContextValue {
   isAuthenticated: boolean;
   login: (token: string, user: AuthUser) => void;
   logout: () => void;
+  updateUser: (updates: Partial<AuthUser>) => void;
 }
 
 const AuthContext = createContext<AuthContextValue>({
@@ -15,6 +17,7 @@ const AuthContext = createContext<AuthContextValue>({
   isAuthenticated: false,
   login: () => {},
   logout: () => {},
+  updateUser: () => {},
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -26,11 +29,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return raw ? (JSON.parse(raw) as AuthUser) : null;
   });
 
+  useEffect(() => {
+    if (user?.locale) {
+      i18next.changeLanguage(user.locale);
+    }
+  }, []);
+
   const login = useCallback((newToken: string, newUser: AuthUser) => {
     localStorage.setItem('auth_token', newToken);
     localStorage.setItem('auth_user', JSON.stringify(newUser));
     setToken(newToken);
     setUser(newUser);
+    i18next.changeLanguage(newUser.locale ?? 'en');
   }, []);
 
   const logout = useCallback(() => {
@@ -40,8 +50,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(null);
   }, []);
 
+  const updateUser = useCallback((updates: Partial<AuthUser>) => {
+    setUser((prev) => {
+      if (!prev) return prev;
+      const updated = { ...prev, ...updates };
+      localStorage.setItem('auth_user', JSON.stringify(updated));
+      return updated;
+    });
+  }, []);
+
   return (
-    <AuthContext.Provider value={{ user, token, isAuthenticated: !!token, login, logout }}>
+    <AuthContext.Provider value={{ user, token, isAuthenticated: !!token, login, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

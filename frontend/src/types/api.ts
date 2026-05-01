@@ -108,4 +108,5 @@ export interface AuthUser {
   email: string;
   displayName: string;
   currency: string;
+  locale: string;
 }
