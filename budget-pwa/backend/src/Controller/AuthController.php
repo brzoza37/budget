@@ -14,6 +14,8 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class AuthController extends AbstractController
 {
+    private const SUPPORTED_LOCALES = ['en', 'pl'];
+
     #[Route('/api/auth/register', name: 'auth_register', methods: ['POST'])]
     public function register(
         Request $request,
@@ -25,6 +27,7 @@ class AuthController extends AbstractController
         $email = strtolower(trim((string) ($data['email'] ?? '')));
         $password = (string) ($data['password'] ?? '');
         $displayName = trim((string) ($data['displayName'] ?? ''));
+        $locale = (string) ($data['locale'] ?? 'en');
 
         if ($email === '' || $password === '' || $displayName === '') {
             return $this->json(['error' => 'email, password, and displayName are required'], Response::HTTP_BAD_REQUEST);
@@ -41,11 +44,15 @@ class AuthController extends AbstractController
         if ($em->getRepository(User::class)->findOneBy(['email' => $email])) {
             return $this->json(['error' => 'Email already registered'], Response::HTTP_CONFLICT);
         }
+        if (!in_array($locale, self::SUPPORTED_LOCALES, true)) {
+            $locale = 'en';
+        }
 
         $user = new User();
         $user->setEmail($email);
         $user->setDisplayName($displayName);
         $user->setPassword($hasher->hashPassword($user, $password));
+        $user->setLocale($locale);
 
         $em->persist($user);
         $em->flush();
@@ -57,6 +64,7 @@ class AuthController extends AbstractController
                 'email' => $user->getEmail(),
                 'displayName' => $user->getDisplayName(),
                 'currency' => $user->getCurrency(),
+                'locale' => $user->getLocale(),
             ],
         ], Response::HTTP_CREATED);
     }
@@ -74,6 +82,38 @@ class AuthController extends AbstractController
             'email' => $user->getEmail(),
             'displayName' => $user->getDisplayName(),
             'currency' => $user->getCurrency(),
+            'locale' => $user->getLocale(),
+        ]);
+    }
+
+    #[Route('/api/auth/me', name: 'auth_me_patch', methods: ['PATCH'])]
+    public function patchMe(
+        Request $request,
+        EntityManagerInterface $em,
+    ): JsonResponse {
+        $user = $this->getUser();
+        if (!$user instanceof User) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $data = json_decode($request->getContent(), true) ?? [];
+
+        if (array_key_exists('locale', $data)) {
+            $locale = (string) $data['locale'];
+            if (!in_array($locale, self::SUPPORTED_LOCALES, true)) {
+                return $this->json(['error' => 'Invalid locale. Supported: en, pl'], Response::HTTP_BAD_REQUEST);
+            }
+            $user->setLocale($locale);
+        }
+
+        $em->flush();
+
+        return $this->json([
+            'id' => $user->getId(),
+            'email' => $user->getEmail(),
+            'displayName' => $user->getDisplayName(),
+            'currency' => $user->getCurrency(),
+            'locale' => $user->getLocale(),
         ]);
     }
 }

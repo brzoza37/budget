@@ -19,6 +19,7 @@ class AuthenticationSuccessListener
             'email' => $user->getEmail(),
             'displayName' => $user->getDisplayName(),
             'currency' => $user->getCurrency(),
+            'locale' => $user->getLocale(),
         ];
         $event->setData($data);
     }

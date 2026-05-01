@@ -135,4 +135,116 @@ class AuthControllerTest extends WebTestCase
         $this->assertEquals('me@example.com', $data['email']);
         $this->assertEquals('Me User', $data['displayName']);
     }
+
+    public function testRegisterDefaultLocaleIsEn(): void
+    {
+        $client = static::createClient();
+        $this->jsonPost($client, '/api/auth/register', [
+            'email' => 'locale@example.com',
+            'password' => self::VALID_PASSWORD,
+            'displayName' => 'Locale User',
+        ]);
+        $this->assertResponseStatusCodeSame(201);
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals('en', $data['user']['locale']);
+    }
+
+    public function testRegisterAcceptsLocale(): void
+    {
+        $client = static::createClient();
+        $this->jsonPost($client, '/api/auth/register', [
+            'email' => 'pl@example.com',
+            'password' => self::VALID_PASSWORD,
+            'displayName' => 'PL User',
+            'locale' => 'pl',
+        ]);
+        $this->assertResponseStatusCodeSame(201);
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals('pl', $data['user']['locale']);
+    }
+
+    public function testLoginResponseIncludesLocale(): void
+    {
+        $client = static::createClient();
+        $this->jsonPost($client, '/api/auth/register', [
+            'email' => 'loginlocale@example.com',
+            'password' => self::VALID_PASSWORD,
+            'displayName' => 'Login Locale',
+            'locale' => 'pl',
+        ]);
+        $this->jsonPost($client, '/api/auth/login', [
+            'email' => 'loginlocale@example.com',
+            'password' => self::VALID_PASSWORD,
+        ]);
+        $this->assertResponseIsSuccessful();
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals('pl', $data['user']['locale']);
+    }
+
+    public function testMeIncludesLocale(): void
+    {
+        $client = static::createClient();
+        $this->jsonPost($client, '/api/auth/register', [
+            'email' => 'melocale@example.com',
+            'password' => self::VALID_PASSWORD,
+            'displayName' => 'Me Locale',
+        ]);
+        $token = json_decode($client->getResponse()->getContent(), true)['token'];
+        $client->request('GET', '/api/auth/me', [], [], [
+            'HTTP_AUTHORIZATION' => "Bearer $token",
+        ]);
+        $this->assertResponseIsSuccessful();
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertArrayHasKey('locale', $data);
+        $this->assertEquals('en', $data['locale']);
+    }
+
+    public function testPatchMeUpdatesLocale(): void
+    {
+        $client = static::createClient();
+        $this->jsonPost($client, '/api/auth/register', [
+            'email' => 'patch@example.com',
+            'password' => self::VALID_PASSWORD,
+            'displayName' => 'Patch User',
+        ]);
+        $token = json_decode($client->getResponse()->getContent(), true)['token'];
+
+        $client->request(
+            'PATCH', '/api/auth/me', [], [],
+            ['CONTENT_TYPE' => 'application/json', 'HTTP_AUTHORIZATION' => "Bearer $token"],
+            json_encode(['locale' => 'pl'])
+        );
+        $this->assertResponseIsSuccessful();
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals('pl', $data['locale']);
+    }
+
+    public function testPatchMeRejectsInvalidLocale(): void
+    {
+        $client = static::createClient();
+        $this->jsonPost($client, '/api/auth/register', [
+            'email' => 'patchbad@example.com',
+            'password' => self::VALID_PASSWORD,
+            'displayName' => 'Patch Bad',
+        ]);
+        $token = json_decode($client->getResponse()->getContent(), true)['token'];
+
+        $client->request(
+            'PATCH', '/api/auth/me', [], [],
+            ['CONTENT_TYPE' => 'application/json', 'HTTP_AUTHORIZATION' => "Bearer $token"],
+            json_encode(['locale' => 'de'])
+        );
+        $this->assertResponseStatusCodeSame(400);
+    }
+
+    public function testPatchMeRequiresAuth(): void
+    {
+        $client = static::createClient();
+        $client->request(
+            'PATCH', '/api/auth/me', [], [],
+            ['CONTENT_TYPE' => 'application/json'],
+            json_encode(['locale' => 'pl'])
+        );
+        $this->assertResponseStatusCodeSame(401);
+    }
 }
