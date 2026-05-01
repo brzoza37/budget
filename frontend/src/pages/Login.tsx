@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import { Box, TextField, Button, Typography, Alert, Link, Paper } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 import apiClient from '../api/apiClient';
 import { useAuth } from '../context/AuthContext';
 import { AuthUser } from '../types/api';
 
 export default function Login() {
+  const { t } = useTranslation();
   const { login } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
@@ -26,7 +28,7 @@ export default function Login() {
       login(res.data.token, res.data.user);
       navigate('/');
     } catch {
-      setError('Invalid email or password');
+      setError(t('auth.invalidCredentials'));
     } finally {
       setLoading(false);
     }
@@ -35,11 +37,11 @@ export default function Login() {
   return (
     <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: 'background.default' }}>
       <Paper sx={{ p: 4, width: '100%', maxWidth: 400 }}>
-        <Typography variant="h5" fontWeight="bold" mb={3}>Sign in</Typography>
+        <Typography variant="h5" fontWeight="bold" mb={3}>{t('auth.signIn')}</Typography>
         {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
         <form onSubmit={handleSubmit}>
           <TextField
-            label="Email"
+            label={t('auth.email')}
             type="email"
             fullWidth
             value={email}
@@ -49,7 +51,7 @@ export default function Login() {
             sx={{ mb: 2 }}
           />
           <TextField
-            label="Password"
+            label={t('auth.password')}
             type="password"
             fullWidth
             value={password}
@@ -59,12 +61,12 @@ export default function Login() {
             sx={{ mb: 3 }}
           />
           <Button type="submit" variant="contained" fullWidth size="large" disabled={loading}>
-            {loading ? 'Signing in…' : 'Sign in'}
+            {loading ? t('auth.signingIn') : t('auth.signIn')}
           </Button>
         </form>
         <Typography mt={3} textAlign="center" variant="body2">
-          No account?{' '}
-          <Link component={RouterLink} to="/register">Create one</Link>
+          {t('auth.noAccount')}{' '}
+          <Link component={RouterLink} to="/register">{t('auth.createOne')}</Link>
         </Typography>
       </Paper>
     </Box>

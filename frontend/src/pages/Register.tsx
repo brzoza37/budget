@@ -1,20 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import { Box, TextField, Button, Typography, Alert, Link, Paper } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 import apiClient from '../api/apiClient';
 import { useAuth } from '../context/AuthContext';
 import { AuthUser } from '../types/api';
 
-const PASSWORD_RULES = [
-  { label: 'At least 12 characters', test: (p: string) => p.length >= 12 },
-  { label: 'One uppercase letter', test: (p: string) => /[A-Z]/.test(p) },
-  { label: 'One number', test: (p: string) => /[0-9]/.test(p) },
-  { label: 'One special character', test: (p: string) => /[^A-Za-z0-9]/.test(p) },
-];
-
-const isPasswordValid = (p: string) => PASSWORD_RULES.every(r => r.test(p));
-
 export default function Register() {
+  const { t } = useTranslation();
   const { login } = useAuth();
   const navigate = useNavigate();
   const [displayName, setDisplayName] = useState('');
@@ -25,14 +18,23 @@ export default function Register() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const PASSWORD_RULES = [
+    { key: 'length', test: (p: string) => p.length >= 12 },
+    { key: 'uppercase', test: (p: string) => /[A-Z]/.test(p) },
+    { key: 'number', test: (p: string) => /[0-9]/.test(p) },
+    { key: 'special', test: (p: string) => /[^A-Za-z0-9]/.test(p) },
+  ];
+
+  const isPasswordValid = (p: string) => PASSWORD_RULES.every(r => r.test(p));
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isPasswordValid(password)) {
-      setError('Password does not meet all requirements');
+      setError(t('auth.passwordRequirements'));
       return;
     }
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      setError(t('auth.passwordMismatch'));
       return;
     }
     setError('');
@@ -48,7 +50,7 @@ export default function Register() {
       navigate('/');
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { error?: string } } }).response?.data?.error;
-      setError(msg ?? 'Registration failed. Please try again.');
+      setError(msg ?? t('auth.registrationFailed'));
     } finally {
       setLoading(false);
     }
@@ -59,11 +61,11 @@ export default function Register() {
   return (
     <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: 'background.default' }}>
       <Paper sx={{ p: 4, width: '100%', maxWidth: 400 }}>
-        <Typography variant="h5" fontWeight="bold" mb={3}>Create account</Typography>
+        <Typography variant="h5" fontWeight="bold" mb={3}>{t('auth.register')}</Typography>
         {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
         <form onSubmit={handleSubmit}>
           <TextField
-            label="Your name"
+            label={t('auth.displayName')}
             fullWidth
             value={displayName}
             onChange={e => setDisplayName(e.target.value)}
@@ -72,7 +74,7 @@ export default function Register() {
             sx={{ mb: 2 }}
           />
           <TextField
-            label="Email"
+            label={t('auth.email')}
             type="email"
             fullWidth
             value={email}
@@ -82,7 +84,7 @@ export default function Register() {
             sx={{ mb: 2 }}
           />
           <TextField
-            label="Password"
+            label={t('auth.password')}
             type="password"
             fullWidth
             value={password}
@@ -99,18 +101,18 @@ export default function Register() {
               const show = passwordTouched || password.length > 0;
               return (
                 <Typography
-                  key={rule.label}
+                  key={rule.key}
                   variant="caption"
                   display="block"
                   sx={{ color: show ? (met ? 'success.main' : 'error.main') : 'text.secondary' }}
                 >
-                  {show ? (met ? '✓' : '✗') : '·'} {rule.label}
+                  {show ? (met ? '✓' : '✗') : '·'} {t(`auth.passwordRules.${rule.key}`)}
                 </Typography>
               );
             })}
           </Box>
           <TextField
-            label="Confirm password"
+            label={t('auth.confirmPassword')}
             type="password"
             fullWidth
             value={confirmPassword}
@@ -118,16 +120,16 @@ export default function Register() {
             required
             autoComplete="new-password"
             error={confirmPassword.length > 0 && password !== confirmPassword}
-            helperText={confirmPassword.length > 0 && password !== confirmPassword ? 'Passwords do not match' : ' '}
+            helperText={confirmPassword.length > 0 && password !== confirmPassword ? t('auth.passwordMismatch') : ' '}
             sx={{ mb: 3 }}
           />
           <Button type="submit" variant="contained" fullWidth size="large" disabled={loading}>
-            {loading ? 'Creating account…' : 'Create account'}
+            {loading ? t('auth.creatingAccount') : t('auth.register')}
           </Button>
         </form>
         <Typography mt={3} textAlign="center" variant="body2">
-          Already have an account?{' '}
-          <Link component={RouterLink} to="/login">Sign in</Link>
+          {t('auth.alreadyHaveAccount')}{' '}
+          <Link component={RouterLink} to="/login">{t('auth.signInLink')}</Link>
         </Typography>
       </Paper>
     </Box>
