@@ -56,6 +56,23 @@
     "title": "Konta",
     "noAccounts": "Brak kont."
   },
+  "categories": {
+    "title": "Kategorie",
+    "expenses": "Wydatki",
+    "income": "Przychody",
+    "addCategory": "Dodaj kategorię",
+    "editCategory": "Edytuj kategorię",
+    "saveCategory": "Zapisz kategorię",
+    "updateCategory": "Zaktualizuj kategorię",
+    "categoryName": "Nazwa kategorii",
+    "categoryNamePlaceholder": "np. Jedzenie, Wynagrodzenie, Prezent",
+    "categoryColor": "Kolor kategorii",
+    "categoryIcon": "Ikona",
+    "noCategories": "Brak kategorii.",
+    "archiveCategory": "Archiwizuj",
+    "typeExpense": "Wydatek",
+    "typeIncome": "Przychód"
+  },
   "settings": {
     "title": "Ustawienia",
     "accountSection": "Konto",

@@ -56,6 +56,23 @@
     "title": "Accounts",
     "noAccounts": "No accounts yet."
   },
+  "categories": {
+    "title": "Categories",
+    "expenses": "Expenses",
+    "income": "Income",
+    "addCategory": "Add Category",
+    "editCategory": "Edit Category",
+    "saveCategory": "Save Category",
+    "updateCategory": "Update Category",
+    "categoryName": "Category Name",
+    "categoryNamePlaceholder": "e.g. Food, Salary, Gift",
+    "categoryColor": "Category Color",
+    "categoryIcon": "Icon",
+    "noCategories": "No categories yet.",
+    "archiveCategory": "Archive",
+    "typeExpense": "Expense",
+    "typeIncome": "Income"
+  },
   "settings": {
     "title": "Settings",
     "accountSection": "Account",
