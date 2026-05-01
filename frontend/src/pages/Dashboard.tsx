@@ -9,12 +9,14 @@ import {
   ChevronRight as ChevronRightIcon, BarChart as ReportsIcon,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import Layout from '../components/Layout';
 import { useAccounts, useTransactions, useStatsSummary } from '../hooks/useApi';
 import { formatAmount } from '../utils/formatAmount';
 import type { Account, Transaction } from '../types/api';
 
 const Dashboard = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const now = new Date();
   const { data: accounts, isLoading: accountsLoading } = useAccounts();
@@ -55,7 +57,7 @@ const Dashboard = () => {
         {/* Total Balance */}
         <Card sx={{ bgcolor: 'primary.main', color: 'primary.contrastText', mb: 2 }}>
           <CardContent sx={{ textAlign: 'center', py: 3 }}>
-            <Typography variant="labelLarge" sx={{ opacity: 0.8 }}>Total Balance</Typography>
+            <Typography variant="labelLarge" sx={{ opacity: 0.8 }}>{t('dashboard.totalBalance')}</Typography>
             <Typography variant="h4" sx={{ fontWeight: 'bold', my: 1 }}>
               {formatAmount(stats?.totalBalance ?? 0, userCurrency)}
             </Typography>
@@ -74,19 +76,19 @@ const Dashboard = () => {
               </Typography>
               <Stack spacing={0.5}>
                 <Box display="flex" justifyContent="space-between">
-                  <Typography variant="body2" color="success.main">↑ Planned in</Typography>
+                  <Typography variant="body2" color="success.main">{t('dashboard.plannedIn')}</Typography>
                   <Typography variant="body2" color="success.main" fontWeight="bold">
                     {formatAmount(stats?.plannedIncomeThisMonth ?? 0, userCurrency)}
                   </Typography>
                 </Box>
                 <Box display="flex" justifyContent="space-between">
-                  <Typography variant="body2" color="text.secondary">↓ Committed</Typography>
+                  <Typography variant="body2" color="text.secondary">{t('dashboard.committed')}</Typography>
                   <Typography variant="body2" color="text.secondary" fontWeight="bold">
                     {formatAmount(stats?.plannedExpensesThisMonth ?? 0, userCurrency)}
                   </Typography>
                 </Box>
                 <Box display="flex" justifyContent="space-between" sx={{ pt: 0.5, borderTop: '1px solid', borderColor: 'divider' }}>
-                  <Typography variant="body2" fontWeight="bold">✦ Free to plan</Typography>
+                  <Typography variant="body2" fontWeight="bold">{t('dashboard.freeToPlan')}</Typography>
                   <Typography
                     variant="body2"
                     fontWeight="bold"
@@ -106,17 +108,17 @@ const Dashboard = () => {
         {/* Income / Expense */}
         <Stack direction="row" spacing={2} mb={2}>
           <SummaryCard
-            title="Income" amount={stats?.monthlyIncome ?? 0}
+            title={t('dashboard.income')} amount={stats?.monthlyIncome ?? 0}
             currency={userCurrency} icon={<IncomeIcon />} color="#2E7D32"
           />
           <SummaryCard
-            title="Expenses" amount={stats?.monthlyExpense ?? 0}
+            title={t('dashboard.expenses')} amount={stats?.monthlyExpense ?? 0}
             currency={userCurrency} icon={<ExpenseIcon />} color="#C62828"
           />
         </Stack>
 
         {/* Accounts */}
-        <SectionHeader title="Accounts" onAction={() => navigate('/accounts')} />
+        <SectionHeader title={t('nav.accounts')} onAction={() => navigate('/accounts')} />
         <Box display="flex" gap={1.5} overflow="auto" pb={1} mb={2} sx={{ scrollbarWidth: 'none' }}>
           {accounts?.map((account) => (
             <AccountChip key={account.id} account={account} />
@@ -124,11 +126,13 @@ const Dashboard = () => {
         </Box>
 
         {/* Recent Transactions */}
-        <SectionHeader title="Recent Transactions" onAction={() => navigate('/transactions')} />
+        <SectionHeader title={t('dashboard.recentTransactions')} onAction={() => navigate('/transactions')} />
         <Stack spacing={1}>
           {transactions?.length === 0 && (
             <Typography variant="body2" color="text.secondary" align="center" py={2}>
-              No transactions yet. Tap + to add one!
+              {t('dashboard.noTransactions').split('\n').map((line, i) => (
+                <React.Fragment key={i}>{line}{i === 0 && <br />}</React.Fragment>
+              ))}
             </Typography>
           )}
           {transactions?.map((transaction) => (
@@ -171,18 +175,21 @@ const SummaryCard = ({
   </Card>
 );
 
-const SectionHeader = ({ title, onAction }: { title: string; onAction: () => void }) => (
-  <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
-    <Typography variant="titleMedium">{title}</Typography>
-    <Box
-      onClick={onAction}
-      sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer', color: 'primary.main' }}
-    >
-      <Typography variant="labelMedium">See all</Typography>
-      <ChevronRightIcon fontSize="small" />
+const SectionHeader = ({ title, onAction }: { title: string; onAction: () => void }) => {
+  const { t } = useTranslation();
+  return (
+    <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+      <Typography variant="titleMedium">{title}</Typography>
+      <Box
+        onClick={onAction}
+        sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer', color: 'primary.main' }}
+      >
+        <Typography variant="labelMedium">{t('dashboard.seeAll')}</Typography>
+        <ChevronRightIcon fontSize="small" />
+      </Box>
     </Box>
-  </Box>
-);
+  );
+};
 
 const AccountChip = ({ account }: { account: Account }) => (
   <Card sx={{
