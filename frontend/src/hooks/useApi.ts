@@ -360,6 +360,21 @@ export const useDeleteTransaction = () => {
   });
 };
 
+export const useArchiveCategory = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { data } = await apiClient.patch<Category>(`/categories/${id}`, { isArchived: true }, {
+        headers: { 'Content-Type': 'application/merge-patch+json' },
+      });
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['categories'] });
+    },
+  });
+};
+
 export const useDeleteCategory = () => {
   const queryClient = useQueryClient();
   return useMutation({
