@@ -68,6 +68,17 @@
     "languageDesc": "Switch between English and Polish",
     "savingLanguage": "Saving…",
     "languageError": "Failed to save language. Please try again.",
+    "themeSection": "Theme",
+    "savingTheme": "Saving…",
+    "themeError": "Failed to save theme. Please try again.",
+    "themes": {
+      "forest": "Forest",
+      "ocean": "Ocean",
+      "aubergine": "Aubergine",
+      "sunset": "Sunset",
+      "slate": "Slate",
+      "rose": "Rose"
+    },
     "currencySection": "Currency",
     "displayCurrency": "Display Currency",
     "dataSupport": "Data & Support",

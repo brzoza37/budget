@@ -2,33 +2,37 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Box, Typography, List, ListItem, ListItemText, ListItemIcon,
-  Switch, Divider, Select, MenuItem, FormControl, InputLabel, Button,
+  Divider, Select, MenuItem, FormControl, InputLabel, Button,
   ToggleButtonGroup, ToggleButton, Snackbar, Alert,
 } from '@mui/material';
 import {
-  Palette as PaletteIcon, Storage as StorageIcon,
-  Info as InfoIcon, Person as PersonIcon,
+  Storage as StorageIcon, Info as InfoIcon, Person as PersonIcon,
+  Check as CheckIcon,
 } from '@mui/icons-material';
 import Layout from '../components/Layout';
-import { useThemeMode } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
+import { useThemeMode } from '../context/ThemeContext';
 import apiClient from '../api/apiClient';
 import i18next from 'i18next';
 import { useTranslation } from 'react-i18next';
+import { THEME_META } from '../theme/theme';
 
 const CURRENCIES = ['USD', 'EUR', 'GBP', 'PLN', 'JPY', 'CAD', 'AUD', 'CHF', 'CNY'];
 
 const Settings = () => {
   const { t } = useTranslation();
-  const { isDark, toggleTheme } = useThemeMode();
   const { user, logout, updateUser } = useAuth();
+  const { themeName, setThemeName } = useThemeMode();
   const navigate = useNavigate();
+
   const [currency, setCurrency] = React.useState(
     () => localStorage.getItem('display-currency') ?? 'USD'
   );
   const [locale, setLocale] = React.useState<string>(user?.locale ?? 'en');
   const [savingLocale, setSavingLocale] = React.useState(false);
   const [localeError, setLocaleError] = React.useState('');
+  const [savingTheme, setSavingTheme] = React.useState(false);
+  const [themeError, setThemeError] = React.useState('');
 
   const handleCurrencyChange = (value: string) => {
     setCurrency(value);
@@ -52,6 +56,24 @@ const Settings = () => {
       setLocaleError(t('settings.languageError'));
     } finally {
       setSavingLocale(false);
+    }
+  };
+
+  const handleThemeChange = async (id: string) => {
+    if (id === themeName) return;
+    const previous = themeName;
+    setThemeName(id);
+    setSavingTheme(true);
+    try {
+      await apiClient.patch('/auth/me', { theme: id }, {
+        headers: { 'Content-Type': 'application/json' },
+      });
+      updateUser({ theme: id });
+    } catch {
+      setThemeName(previous);
+      setThemeError(t('settings.themeError'));
+    } finally {
+      setSavingTheme(false);
     }
   };
 
@@ -82,16 +104,32 @@ const Settings = () => {
         </SettingsCard>
 
         <Typography variant="titleMedium" sx={{ mt: 4, mb: 2, display: 'block' }}>
-          {t('settings.appearance')}
+          {t('settings.themeSection')}
         </Typography>
         <SettingsCard>
-          <List disablePadding>
-            <ListItem>
-              <ListItemIcon><PaletteIcon /></ListItemIcon>
-              <ListItemText primary={t('settings.darkMode')} secondary={t('settings.darkModeDesc')} />
-              <Switch checked={isDark} onChange={toggleTheme} />
-            </ListItem>
-          </List>
+          <Box p={2}>
+            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 1.5 }}>
+              {THEME_META.map((meta) => (
+                <Box
+                  key={meta.id}
+                  onClick={() => !savingTheme && handleThemeChange(meta.id)}
+                  sx={{ cursor: savingTheme ? 'default' : 'pointer', textAlign: 'center', opacity: savingTheme ? 0.7 : 1 }}
+                >
+                  <Box sx={{
+                    width: 48, height: 48, borderRadius: 3,
+                    bgcolor: meta.primary,
+                    border: '3px solid',
+                    borderColor: themeName === meta.id ? 'text.primary' : 'transparent',
+                    mx: 'auto', mb: 0.5,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>
+                    {themeName === meta.id && <CheckIcon sx={{ color: 'white', fontSize: 20 }} />}
+                  </Box>
+                  <Typography variant="labelSmall">{t(meta.labelKey)}</Typography>
+                </Box>
+              ))}
+            </Box>
+          </Box>
         </SettingsCard>
 
         <Typography variant="titleMedium" sx={{ mt: 4, mb: 2, display: 'block' }}>
@@ -153,12 +191,11 @@ const Settings = () => {
         </SettingsCard>
       </Box>
 
-      <Snackbar
-        open={!!localeError}
-        autoHideDuration={4000}
-        onClose={() => setLocaleError('')}
-      >
+      <Snackbar open={!!localeError} autoHideDuration={4000} onClose={() => setLocaleError('')}>
         <Alert severity="error" onClose={() => setLocaleError('')}>{localeError}</Alert>
+      </Snackbar>
+      <Snackbar open={!!themeError} autoHideDuration={4000} onClose={() => setThemeError('')}>
+        <Alert severity="error" onClose={() => setThemeError('')}>{themeError}</Alert>
       </Snackbar>
     </Layout>
   );

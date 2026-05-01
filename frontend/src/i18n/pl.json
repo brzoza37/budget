@@ -68,6 +68,17 @@
     "languageDesc": "Przełącz między angielskim a polskim",
     "savingLanguage": "Zapisywanie…",
     "languageError": "Nie udało się zapisać języka. Spróbuj ponownie.",
+    "themeSection": "Motyw",
+    "savingTheme": "Zapisywanie…",
+    "themeError": "Nie udało się zapisać motywu. Spróbuj ponownie.",
+    "themes": {
+      "forest": "Forest",
+      "ocean": "Ocean",
+      "aubergine": "Aubergine",
+      "sunset": "Sunset",
+      "slate": "Slate",
+      "rose": "Rose"
+    },
     "currencySection": "Waluta",
     "displayCurrency": "Waluta wyświetlania",
     "dataSupport": "Dane i pomoc",
