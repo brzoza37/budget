@@ -101,7 +101,7 @@ class AuthController extends AbstractController
         if (array_key_exists('theme', $data)) {
             $theme = (string) $data['theme'];
             if (!in_array($theme, self::SUPPORTED_THEMES, true)) {
-                return $this->json(['error' => $this->translator->trans('error.auth.invalid_theme')], Response::HTTP_BAD_REQUEST);
+                return $this->json(['error' => $this->translator->trans('error.auth.invalid_theme', ['%themes%' => implode(', ', self::SUPPORTED_THEMES)])], Response::HTTP_BAD_REQUEST);
             }
             $user->setTheme($theme);
         }

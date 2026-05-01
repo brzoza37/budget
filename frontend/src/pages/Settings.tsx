@@ -59,7 +59,7 @@ const Settings = () => {
     }
   };
 
-  const handleThemeChange = async (id: string) => {
+  const handleThemeChange = async (id: typeof THEME_META[number]['id']) => {
     if (id === themeName) return;
     const previous = themeName;
     setThemeName(id);

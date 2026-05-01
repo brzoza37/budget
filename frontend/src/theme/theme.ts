@@ -1,5 +1,6 @@
 import { createTheme, Theme } from '@mui/material/styles';
-import React from 'react';
+import type { CSSProperties } from 'react';
+import type { ThemeName } from '../types/api';
 
 const sharedTypography = {
   fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
@@ -96,7 +97,7 @@ const roseTheme = createTheme({
   components: sharedComponents,
 });
 
-export const THEMES: Record<string, Theme> = {
+export const THEMES: Record<ThemeName, Theme> = {
   forest: forestTheme,
   ocean: oceanTheme,
   aubergine: aubergineTheme,
@@ -105,7 +106,7 @@ export const THEMES: Record<string, Theme> = {
   rose: roseTheme,
 };
 
-export const THEME_META: { id: string; primary: string; labelKey: string }[] = [
+export const THEME_META: { id: ThemeName; primary: string; labelKey: string }[] = [
   { id: 'forest',    primary: '#4CAF50', labelKey: 'settings.themes.forest' },
   { id: 'ocean',     primary: '#1E88E5', labelKey: 'settings.themes.ocean' },
   { id: 'aubergine', primary: '#AB47BC', labelKey: 'settings.themes.aubergine' },
@@ -116,16 +117,16 @@ export const THEME_META: { id: string; primary: string; labelKey: string }[] = [
 
 declare module '@mui/material/styles' {
   interface TypographyVariants {
-    titleMedium: React.CSSProperties;
-    labelLarge: React.CSSProperties;
-    labelMedium: React.CSSProperties;
-    labelSmall: React.CSSProperties;
+    titleMedium: CSSProperties;
+    labelLarge: CSSProperties;
+    labelMedium: CSSProperties;
+    labelSmall: CSSProperties;
   }
   interface TypographyVariantsOptions {
-    titleMedium?: React.CSSProperties;
-    labelLarge?: React.CSSProperties;
-    labelMedium?: React.CSSProperties;
-    labelSmall?: React.CSSProperties;
+    titleMedium?: CSSProperties;
+    labelLarge?: CSSProperties;
+    labelMedium?: CSSProperties;
+    labelSmall?: CSSProperties;
   }
 }
 

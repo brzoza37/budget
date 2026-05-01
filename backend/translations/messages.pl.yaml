@@ -6,7 +6,7 @@ error:
         password_too_weak: 'Hasło musi mieć co najmniej 12 znaków oraz zawierać wielką literę, cyfrę i znak specjalny'
         email_taken: 'Ten adres e-mail jest już zarejestrowany'
         invalid_locale: 'Nieprawidłowe ustawienie języka. Obsługiwane: en, pl'
-        invalid_theme: 'Nieprawidłowy motyw. Obsługiwane: forest, ocean, aubergine, sunset, slate, rose'
+        invalid_theme: 'Nieprawidłowy motyw. Obsługiwane: %themes%'
     plan:
         item_not_found: 'Nie znaleziono pozycji planu'
         account_not_found: 'Nie znaleziono konta'

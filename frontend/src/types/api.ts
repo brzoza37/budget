@@ -103,11 +103,13 @@ export interface MonthlyTrendItem {
   expense: number;
 }
 
+export type ThemeName = 'forest' | 'ocean' | 'aubergine' | 'sunset' | 'slate' | 'rose';
+
 export interface AuthUser {
   id: number;
   email: string;
   displayName: string;
   currency: string;
   locale: string;
-  theme: string;
+  theme: ThemeName;
 }
