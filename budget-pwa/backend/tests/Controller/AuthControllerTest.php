@@ -247,4 +247,18 @@ class AuthControllerTest extends WebTestCase
         );
         $this->assertResponseStatusCodeSame(401);
     }
+
+    public function testRegisterUnsupportedLocaleDefaultsToEn(): void
+    {
+        $client = static::createClient();
+        $this->jsonPost($client, '/api/auth/register', [
+            'email' => 'unsupported@example.com',
+            'password' => self::VALID_PASSWORD,
+            'displayName' => 'Unsupported Locale',
+            'locale' => 'de',
+        ]);
+        $this->assertResponseStatusCodeSame(201);
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals('en', $data['user']['locale']);
+    }
 }

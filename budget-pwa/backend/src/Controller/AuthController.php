@@ -59,13 +59,7 @@ class AuthController extends AbstractController
 
         return $this->json([
             'token' => $jwtManager->create($user),
-            'user' => [
-                'id' => $user->getId(),
-                'email' => $user->getEmail(),
-                'displayName' => $user->getDisplayName(),
-                'currency' => $user->getCurrency(),
-                'locale' => $user->getLocale(),
-            ],
+            'user'  => $this->userPayload($user),
         ], Response::HTTP_CREATED);
     }
 
@@ -77,13 +71,7 @@ class AuthController extends AbstractController
             throw $this->createAccessDeniedException();
         }
 
-        return $this->json([
-            'id' => $user->getId(),
-            'email' => $user->getEmail(),
-            'displayName' => $user->getDisplayName(),
-            'currency' => $user->getCurrency(),
-            'locale' => $user->getLocale(),
-        ]);
+        return $this->json($this->userPayload($user));
     }
 
     #[Route('/api/auth/me', name: 'auth_me_patch', methods: ['PATCH'])]
@@ -108,12 +96,17 @@ class AuthController extends AbstractController
 
         $em->flush();
 
-        return $this->json([
-            'id' => $user->getId(),
-            'email' => $user->getEmail(),
+        return $this->json($this->userPayload($user));
+    }
+
+    private function userPayload(User $user): array
+    {
+        return [
+            'id'          => $user->getId(),
+            'email'       => $user->getEmail(),
             'displayName' => $user->getDisplayName(),
-            'currency' => $user->getCurrency(),
-            'locale' => $user->getLocale(),
-        ]);
+            'currency'    => $user->getCurrency(),
+            'locale'      => $user->getLocale(),
+        ];
     }
 }
