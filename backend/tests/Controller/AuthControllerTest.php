@@ -408,5 +408,13 @@ class AuthControllerTest extends WebTestCase
         $types = array_column($members, 'type');
         $this->assertContains('EXPENSE', $types);
         $this->assertContains('INCOME', $types);
+
+        $colors = array_column($members, 'color');
+        $this->assertContains('#9E9E9E', $colors);
+        $this->assertContains('#4CAF50', $colors);
+
+        $icons = array_column($members, 'icon');
+        $this->assertContains('category', $icons);
+        $this->assertContains('payments', $icons);
     }
 }
