@@ -4,7 +4,7 @@
 
 **Goal:** Fix all broken UI/API issues so the app is fully navigable and correctly rendering on both mobile and desktop, with real stats, working filters, and a functional reports page — no auth yet.
 
-**Architecture:** Symfony 7 backend (API Platform) + React 18 TypeScript frontend, both running in Docker Compose. Backend service is named `backend`, frontend `frontend`. All commands are run from the `budget-pwa/` directory.
+**Architecture:** Symfony 7 backend (API Platform) + React 18 TypeScript frontend, both running in Docker Compose. Backend service is named `backend`, frontend `frontend`. All commands are run from the project root directory.
 
 **Tech Stack:** PHP 8.3 / Symfony 7 / API Platform 3 / Doctrine ORM / React 18 / TypeScript / MUI v5 / TanStack Query / recharts / framer-motion
 
@@ -12,7 +12,7 @@
 
 ## File Map
 
-### Backend (all paths relative to `budget-pwa/backend/`)
+### Backend (all paths relative to `backend/`)
 | File | Action | Purpose |
 |------|--------|---------|
 | `src/Entity/Account.php` | Modify | Add serialization groups for color, currency, balance, icon |
@@ -25,7 +25,7 @@
 | `config/packages/api_platform.yaml` | Modify | Enable `enable_max_depth` |
 | `config/routes.yaml` | Modify | Register stats routes |
 
-### Frontend (all paths relative to `budget-pwa/frontend/`)
+### Frontend (all paths relative to `frontend/`)
 | File | Action | Purpose |
 |------|--------|---------|
 | `src/types/api.ts` | Modify | Fix Budget type (month/year), fix PlannedPayment type |

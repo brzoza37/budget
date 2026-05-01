@@ -10,7 +10,7 @@
 
 **Docker commands:** All PHP commands run inside the backend container:
 ```
-docker compose -f budget-pwa/docker-compose.yml exec backend <command>
+docker compose  exec backend <command>
 ```
 
 ---
@@ -18,24 +18,24 @@ docker compose -f budget-pwa/docker-compose.yml exec backend <command>
 ## File Map
 
 ### Backend — modified
-- `budget-pwa/backend/src/Entity/Transaction.php` — add `paginationMaximumItemsPerPage: 1000` to `#[ApiResource]`
+- `backend/src/Entity/Transaction.php` — add `paginationMaximumItemsPerPage: 1000` to `#[ApiResource]`
 
 ### Frontend — new
-- `budget-pwa/frontend/src/utils/exportToCsv.ts` — pure function: `Transaction[]` → CSV blob → browser download
+- `frontend/src/utils/exportToCsv.ts` — pure function: `Transaction[]` → CSV blob → browser download
 
 ### Frontend — modified
-- `budget-pwa/frontend/src/pages/Transactions.tsx` — add export button, fetch-all logic, loading/empty/error states
+- `frontend/src/pages/Transactions.tsx` — add export button, fetch-all logic, loading/empty/error states
 
 ---
 
 ## Task 1: Raise Transaction Pagination Limit
 
 **Files:**
-- Modify: `budget-pwa/backend/src/Entity/Transaction.php`
+- Modify: `backend/src/Entity/Transaction.php`
 
 - [ ] **Step 1: Add `paginationMaximumItemsPerPage` to `#[ApiResource]`**
 
-Open `budget-pwa/backend/src/Entity/Transaction.php` and update the `#[ApiResource]` attribute to add the `paginationMaximumItemsPerPage` parameter:
+Open `backend/src/Entity/Transaction.php` and update the `#[ApiResource]` attribute to add the `paginationMaximumItemsPerPage` parameter:
 
 ```php
 #[ApiResource(
@@ -57,7 +57,7 @@ Open `budget-pwa/backend/src/Entity/Transaction.php` and update the `#[ApiResour
 - [ ] **Step 2: Clear cache and verify**
 
 ```bash
-docker compose -f budget-pwa/docker-compose.yml exec backend php bin/console cache:clear
+docker compose  exec backend php bin/console cache:clear
 ```
 
 Expected: `[OK] Cache for the "dev" environment (debug=true) was successfully cleared.`
@@ -65,7 +65,7 @@ Expected: `[OK] Cache for the "dev" environment (debug=true) was successfully cl
 - [ ] **Step 3: Run existing tests to confirm nothing broke**
 
 ```bash
-docker compose -f budget-pwa/docker-compose.yml exec -T \
+docker compose  exec -T \
   -e DATABASE_URL="postgresql://user:password@db:5432/budget_test?serverVersion=16&charset=utf8" \
   -e APP_ENV=test \
   backend vendor/bin/phpunit --testdox
@@ -76,7 +76,7 @@ Expected: `OK (10 tests, 20 assertions)`
 - [ ] **Step 4: Commit**
 
 ```bash
-git add budget-pwa/backend/src/Entity/Transaction.php
+git add backend/src/Entity/Transaction.php
 git commit -m "feat: raise transaction pagination limit to 1000 for CSV export"
 ```
 
@@ -85,11 +85,11 @@ git commit -m "feat: raise transaction pagination limit to 1000 for CSV export"
 ## Task 2: Create `exportToCsv` Utility
 
 **Files:**
-- Create: `budget-pwa/frontend/src/utils/exportToCsv.ts`
+- Create: `frontend/src/utils/exportToCsv.ts`
 
 - [ ] **Step 1: Create the utility**
 
-Create `budget-pwa/frontend/src/utils/exportToCsv.ts`:
+Create `frontend/src/utils/exportToCsv.ts`:
 
 ```typescript
 import type { Transaction } from '../types/api';
@@ -134,7 +134,7 @@ export function exportToCsv(transactions: Transaction[]): void {
 - [ ] **Step 2: Commit**
 
 ```bash
-git add budget-pwa/frontend/src/utils/exportToCsv.ts
+git add frontend/src/utils/exportToCsv.ts
 git commit -m "feat: add exportToCsv utility"
 ```
 
@@ -143,13 +143,13 @@ git commit -m "feat: add exportToCsv utility"
 ## Task 3: Add Export CSV Button to Transactions Page
 
 **Files:**
-- Modify: `budget-pwa/frontend/src/pages/Transactions.tsx`
+- Modify: `frontend/src/pages/Transactions.tsx`
 
 The current file imports `Button` from MUI and `useTransactions, useDeleteTransaction` from hooks. It does NOT import `apiClient` directly — that needs to be added.
 
 - [ ] **Step 1: Update MUI and icon imports**
 
-Replace the two import blocks at the top of `budget-pwa/frontend/src/pages/Transactions.tsx`:
+Replace the two import blocks at the top of `frontend/src/pages/Transactions.tsx`:
 
 ```typescript
 import {
@@ -249,7 +249,7 @@ Inside the `<Layout>` return block, immediately before `<Box p={2}>`, add:
 - [ ] **Step 6: Verify the build has no errors**
 
 ```bash
-docker compose -f budget-pwa/docker-compose.yml exec -T frontend sh -c "npx vite build 2>&1 | tail -5"
+docker compose  exec -T frontend sh -c "npx vite build 2>&1 | tail -5"
 ```
 
 Expected: `✓ built in ...`
@@ -267,6 +267,6 @@ Open http://localhost:3000/transactions in the browser (log in first).
 - [ ] **Step 8: Commit**
 
 ```bash
-git add budget-pwa/frontend/src/pages/Transactions.tsx
+git add frontend/src/pages/Transactions.tsx
 git commit -m "feat: add Export CSV button to Transactions page"
 ```
