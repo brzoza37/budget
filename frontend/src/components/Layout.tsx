@@ -24,6 +24,7 @@ import {
   Settings as SettingsIcon,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -34,18 +35,19 @@ interface LayoutProps {
 
 const SIDEBAR_WIDTH = 240;
 
-const NAV_ITEMS = [
-  { label: 'Dashboard', icon: <DashboardIcon />, path: '/' },
-  { label: 'Transactions', icon: <TransactionsIcon />, path: '/transactions' },
-  { label: 'Plan', icon: <CalendarMonthIcon />, path: '/plan' },
-  { label: 'Settings', icon: <SettingsIcon />, path: '/settings' },
-];
-
 const Layout: React.FC<LayoutProps> = ({ children, title, actions, navigationIcon }) => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const theme = useTheme();
   const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
+
+  const NAV_ITEMS = [
+    { label: t('nav.dashboard'), icon: <DashboardIcon />, path: '/' },
+    { label: t('nav.transactions'), icon: <TransactionsIcon />, path: '/transactions' },
+    { label: t('nav.plan'), icon: <CalendarMonthIcon />, path: '/plan' },
+    { label: t('nav.settings'), icon: <SettingsIcon />, path: '/settings' },
+  ];
 
   const activeValue = NAV_ITEMS.find(
     (item) => item.path === '/'
