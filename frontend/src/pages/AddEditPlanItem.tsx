@@ -86,7 +86,7 @@ const AddEditPlanItem = () => {
           account: form.account || undefined,
           dueDate: form.dueDate,
           note: form.note || undefined,
-        } as Partial<PlannedItem>);
+        } as unknown as Partial<PlannedItem>);
       } else if (mode === 'one-off') {
         await createItem.mutateAsync({
           name: form.name,
@@ -96,7 +96,7 @@ const AddEditPlanItem = () => {
           account: form.account || undefined,
           dueDate: form.dueDate,
           note: form.note || undefined,
-        } as Partial<PlannedItem>);
+        } as unknown as Partial<PlannedItem>);
       } else {
         // Create recurring event then generate current month
         await createEvent.mutateAsync({
@@ -110,7 +110,7 @@ const AddEditPlanItem = () => {
           dayOfMonth: form.dayOfMonth ? parseInt(form.dayOfMonth, 10) : undefined,
           startDate: form.startDate + 'T00:00:00+00:00',
           note: form.note || undefined,
-        } as Partial<RecurringEvent>);
+        } as unknown as Partial<RecurringEvent>);
 
         await generateMonth.mutateAsync({ month: now.getMonth() + 1, year: now.getFullYear() });
       }

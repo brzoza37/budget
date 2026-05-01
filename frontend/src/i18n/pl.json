@@ -1,0 +1,110 @@
+{
+  "nav": {
+    "dashboard": "Przegląd",
+    "transactions": "Transakcje",
+    "plan": "Plan",
+    "settings": "Ustawienia",
+    "accounts": "Konta"
+  },
+  "dashboard": {
+    "totalBalance": "Łączne saldo",
+    "plannedIn": "↑ Zaplanowane wpływy",
+    "committed": "↓ Zobowiązania",
+    "freeToPlan": "✦ Do zaplanowania",
+    "income": "Przychody",
+    "expenses": "Wydatki",
+    "recentTransactions": "Ostatnie transakcje",
+    "noTransactions": "Brak transakcji.\nDotknij + aby dodać!",
+    "seeAll": "Zobacz wszystkie"
+  },
+  "transactions": {
+    "title": "Transakcje",
+    "noTransactions": "Brak transakcji.",
+    "addFirst": "Dotknij + aby dodać!",
+    "exportCsv": "Eksportuj CSV",
+    "exportFailed": "Eksport nieudany. Spróbuj ponownie.",
+    "noTransactionsToExport": "Brak transakcji do eksportu",
+    "clearFilter": "Wyczyść filtr: {{type}}",
+    "filterByType": "Filtruj według typu",
+    "all": "Wszystkie",
+    "income": "Przychód",
+    "expense": "Wydatek",
+    "transfer": "Przelew",
+    "deleteConfirm": "Usunąć tę transakcję na {{amount}}?"
+  },
+  "plan": {
+    "title": "Plan miesięczny",
+    "income": "Przychody",
+    "expenses": "Wydatki",
+    "noItems": "Brak zaplanowanych pozycji na ten miesiąc.",
+    "deleteItem": "Usuń pozycję",
+    "deleteItemConfirm": "Usunąć „{{name}}“?",
+    "deleteItemRecurring": "Zostanie usunięte tylko to wystąpienie.",
+    "markAsPaid": "Oznacz jako zapłacone",
+    "markAsReceived": "Oznacz jako otrzymane",
+    "fullAmount": "Pełna kwota ({{amount}})",
+    "partial": "Częściowe",
+    "amount": "Kwota",
+    "account": "Konto",
+    "date": "Data",
+    "saving": "Zapisywanie...",
+    "alreadyPaid": "({{amount}} już zapłacono)",
+    "due": "Termin {{date}}"
+  },
+  "accounts": {
+    "title": "Konta",
+    "noAccounts": "Brak kont."
+  },
+  "settings": {
+    "title": "Ustawienia",
+    "accountSection": "Konto",
+    "signOut": "Wyloguj się",
+    "appearance": "Wygląd",
+    "darkMode": "Tryb ciemny",
+    "darkModeDesc": "Przełącz między jasnym a ciemnym motywem",
+    "languageSection": "Język",
+    "language": "Język",
+    "languageDesc": "Przełącz między angielskim a polskim",
+    "savingLanguage": "Zapisywanie…",
+    "languageError": "Nie udało się zapisać języka. Spróbuj ponownie.",
+    "currencySection": "Waluta",
+    "displayCurrency": "Waluta wyświetlania",
+    "dataSupport": "Dane i pomoc",
+    "exportData": "Eksportuj dane",
+    "exportDataDesc": "Wkrótce",
+    "about": "O aplikacji",
+    "aboutDesc": "Budget PWA v1.0.0 — Faza 1"
+  },
+  "auth": {
+    "signIn": "Zaloguj się",
+    "signingIn": "Logowanie…",
+    "register": "Utwórz konto",
+    "creatingAccount": "Tworzenie konta…",
+    "email": "E-mail",
+    "password": "Hasło",
+    "confirmPassword": "Potwierdź hasło",
+    "displayName": "Twoje imię",
+    "noAccount": "Nie masz konta?",
+    "createOne": "Utwórz je",
+    "alreadyHaveAccount": "Masz już konto?",
+    "signInLink": "Zaloguj się",
+    "invalidCredentials": "Nieprawidłowy e-mail lub hasło",
+    "registrationFailed": "Rejestracja nieudana. Spróbuj ponownie.",
+    "passwordMismatch": "Hasła nie są zgodne",
+    "passwordRequirements": "Hasło nie spełnia wymagań",
+    "passwordRules": {
+      "length": "Co najmniej 12 znaków",
+      "uppercase": "Jedna wielka litera",
+      "number": "Jedna cyfra",
+      "special": "Jeden znak specjalny"
+    }
+  },
+  "common": {
+    "save": "Zapisz",
+    "cancel": "Anuluj",
+    "delete": "Usuń",
+    "confirm": "Potwierdź",
+    "loading": "Ładowanie…",
+    "error": "Błąd"
+  }
+}

@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { AppThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
 import App from './App';
+import './i18n/index';
 import './index.css';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(

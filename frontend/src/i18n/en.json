@@ -1,0 +1,110 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "transactions": "Transactions",
+    "plan": "Plan",
+    "settings": "Settings",
+    "accounts": "Accounts"
+  },
+  "dashboard": {
+    "totalBalance": "Total Balance",
+    "plannedIn": "↑ Planned in",
+    "committed": "↓ Committed",
+    "freeToPlan": "✦ Free to plan",
+    "income": "Income",
+    "expenses": "Expenses",
+    "recentTransactions": "Recent Transactions",
+    "noTransactions": "No transactions yet.\nTap + to add one!",
+    "seeAll": "See all"
+  },
+  "transactions": {
+    "title": "Transactions",
+    "noTransactions": "No transactions yet.",
+    "addFirst": "Tap + to add one!",
+    "exportCsv": "Export CSV",
+    "exportFailed": "Export failed. Please try again.",
+    "noTransactionsToExport": "No transactions to export",
+    "clearFilter": "Clear filter: {{type}}",
+    "filterByType": "Filter by type",
+    "all": "All",
+    "income": "Income",
+    "expense": "Expense",
+    "transfer": "Transfer",
+    "deleteConfirm": "Delete this transaction of {{amount}}?"
+  },
+  "plan": {
+    "title": "Monthly Plan",
+    "income": "Income",
+    "expenses": "Expenses",
+    "noItems": "No items planned for this month.",
+    "deleteItem": "Delete Item",
+    "deleteItemConfirm": "Delete \"{{name}}\"?",
+    "deleteItemRecurring": "This will only remove this occurrence.",
+    "markAsPaid": "Mark as Paid",
+    "markAsReceived": "Mark as Received",
+    "fullAmount": "Full ({{amount}})",
+    "partial": "Partial",
+    "amount": "Amount",
+    "account": "Account",
+    "date": "Date",
+    "saving": "Saving...",
+    "alreadyPaid": "({{amount}} already paid)",
+    "due": "Due {{date}}"
+  },
+  "accounts": {
+    "title": "Accounts",
+    "noAccounts": "No accounts yet."
+  },
+  "settings": {
+    "title": "Settings",
+    "accountSection": "Account",
+    "signOut": "Sign out",
+    "appearance": "Appearance",
+    "darkMode": "Dark Mode",
+    "darkModeDesc": "Switch between light and dark theme",
+    "languageSection": "Language",
+    "language": "Language",
+    "languageDesc": "Switch between English and Polish",
+    "savingLanguage": "Saving…",
+    "languageError": "Failed to save language. Please try again.",
+    "currencySection": "Currency",
+    "displayCurrency": "Display Currency",
+    "dataSupport": "Data & Support",
+    "exportData": "Export Data",
+    "exportDataDesc": "Coming soon",
+    "about": "About",
+    "aboutDesc": "Budget PWA v1.0.0 — Phase 1"
+  },
+  "auth": {
+    "signIn": "Sign in",
+    "signingIn": "Signing in…",
+    "register": "Create account",
+    "creatingAccount": "Creating account…",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm password",
+    "displayName": "Your name",
+    "noAccount": "No account?",
+    "createOne": "Create one",
+    "alreadyHaveAccount": "Already have an account?",
+    "signInLink": "Sign in",
+    "invalidCredentials": "Invalid email or password",
+    "registrationFailed": "Registration failed. Please try again.",
+    "passwordMismatch": "Passwords do not match",
+    "passwordRequirements": "Password does not meet all requirements",
+    "passwordRules": {
+      "length": "At least 12 characters",
+      "uppercase": "One uppercase letter",
+      "number": "One number",
+      "special": "One special character"
+    }
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "confirm": "Confirm",
+    "loading": "Loading…",
+    "error": "Error"
+  }
+}

@@ -67,9 +67,11 @@ const AddEditBudget = () => {
 
     try {
       if (isEdit) {
-        await updateMutation.mutateAsync(payload);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await updateMutation.mutateAsync(payload as any);
       } else {
-        await createMutation.mutateAsync(payload);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await createMutation.mutateAsync(payload as any);
       }
       navigate('/budget');
     } catch (error) {

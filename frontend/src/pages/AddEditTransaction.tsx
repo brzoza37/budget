@@ -36,7 +36,7 @@ const AddEditTransaction = () => {
   const createMutation = useCreateTransaction();
   const updateMutation = useUpdateTransaction(id || '');
 
-  const [type, setType] = useState('EXPENSE');
+  const [type, setType] = useState<'INCOME' | 'EXPENSE' | 'TRANSFER'>('EXPENSE');
   const [amount, setAmount] = useState('');
   const [accountId, setAccountId] = useState('');
   const [categoryId, setCategoryId] = useState('');
@@ -70,9 +70,11 @@ const AddEditTransaction = () => {
     };
 
     if (isEdit) {
-      await updateMutation.mutateAsync(payload);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await updateMutation.mutateAsync(payload as any);
     } else {
-      await createMutation.mutateAsync(payload);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await createMutation.mutateAsync(payload as any);
     }
     navigate(-1);
   };
