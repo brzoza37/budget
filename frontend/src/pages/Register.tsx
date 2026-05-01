@@ -38,9 +38,10 @@ export default function Register() {
     setError('');
     setLoading(true);
     try {
+      const locale = navigator.language.startsWith('pl') ? 'pl' : 'en';
       const res = await apiClient.post<{ token: string; user: AuthUser }>(
         '/auth/register',
-        { email, password, displayName },
+        { email, password, displayName, locale },
         { headers: { 'Content-Type': 'application/json' } }
       );
       login(res.data.token, res.data.user);
