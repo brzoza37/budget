@@ -15,16 +15,18 @@ import {
   AccountBalance as AccountIcon,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import Layout from '../components/Layout';
 import { useAccounts } from '../hooks/useApi';
 
 const Accounts = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { data: accounts, isLoading } = useAccounts();
 
   if (isLoading) {
     return (
-      <Layout title="Accounts">
+      <Layout title={t('accounts.title')}>
         <Box display="flex" justifyContent="center" alignItems="center" height="80vh">
           <CircularProgress />
         </Box>
@@ -33,7 +35,7 @@ const Accounts = () => {
   }
 
   return (
-    <Layout title="Accounts">
+    <Layout title={t('accounts.title')}>
       <Box p={2}>
         <Stack spacing={2}>
           {accounts?.map((account) => (

@@ -9,6 +9,7 @@ import {
   PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer,
   BarChart, Bar, XAxis, YAxis, CartesianGrid,
 } from 'recharts';
+import { useTranslation } from 'react-i18next';
 import Layout from '../components/Layout';
 import { useTransactions, useMonthlyTrend } from '../hooks/useApi';
 import { formatAmount } from '../utils/formatAmount';
@@ -16,6 +17,7 @@ import { formatAmount } from '../utils/formatAmount';
 const COLORS = ['#4CAF50', '#FF5722', '#2196F3', '#FF9800', '#9C27B0', '#00BCD4', '#E91E63', '#607D8B'];
 
 const Reports = () => {
+  const { t } = useTranslation();
   const [viewDate, setViewDate] = useState(new Date());
   const month = viewDate.getMonth() + 1;
   const year = viewDate.getFullYear();
@@ -55,7 +57,7 @@ const Reports = () => {
 
   if (txLoading || trendLoading) {
     return (
-      <Layout title="Reports">
+      <Layout title={t('nav.reports')}>
         <Box display="flex" justifyContent="center" alignItems="center" height="80vh">
           <CircularProgress />
         </Box>
@@ -80,7 +82,7 @@ const Reports = () => {
 
               {pieData.length === 0 ? (
                 <Typography variant="body2" color="text.secondary" align="center" py={4}>
-                  No expenses recorded for this month.
+                  {t('reports.noExpenses')}
                 </Typography>
               ) : (
                 <>
@@ -122,7 +124,7 @@ const Reports = () => {
           {/* Income vs Expense Trend */}
           <Card>
             <CardContent>
-              <Typography variant="titleMedium" mb={2}>Income vs Expenses — Last 6 Months</Typography>
+              <Typography variant="titleMedium" mb={2}>{t('reports.trend')}</Typography>
               <ResponsiveContainer width="100%" height={220}>
                 <BarChart data={barData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} />

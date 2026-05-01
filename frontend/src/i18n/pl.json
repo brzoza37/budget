@@ -4,7 +4,8 @@
     "transactions": "Transakcje",
     "plan": "Plan",
     "settings": "Ustawienia",
-    "accounts": "Konta"
+    "accounts": "Konta",
+    "reports": "Raporty"
   },
   "dashboard": {
     "totalBalance": "Łączne saldo",
@@ -98,6 +99,10 @@
       "number": "Jedna cyfra",
       "special": "Jeden znak specjalny"
     }
+  },
+  "reports": {
+    "noExpenses": "Brak wydatków w tym miesiącu.",
+    "trend": "Przychody i wydatki — ostatnie 6 miesięcy"
   },
   "common": {
     "save": "Zapisz",

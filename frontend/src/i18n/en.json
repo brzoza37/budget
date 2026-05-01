@@ -4,7 +4,8 @@
     "transactions": "Transactions",
     "plan": "Plan",
     "settings": "Settings",
-    "accounts": "Accounts"
+    "accounts": "Accounts",
+    "reports": "Reports"
   },
   "dashboard": {
     "totalBalance": "Total Balance",
@@ -98,6 +99,10 @@
       "number": "One number",
       "special": "One special character"
     }
+  },
+  "reports": {
+    "noExpenses": "No expenses recorded for this month.",
+    "trend": "Income vs Expenses — Last 6 Months"
   },
   "common": {
     "save": "Save",
