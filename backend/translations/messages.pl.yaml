@@ -1,0 +1,13 @@
+error:
+    auth:
+        email_required: 'Adres e-mail, hasło i nazwa są wymagane'
+        display_name_too_long: 'Nazwa nie może przekraczać 255 znaków'
+        invalid_email: 'Nieprawidłowy adres e-mail'
+        password_too_weak: 'Hasło musi mieć co najmniej 12 znaków oraz zawierać wielką literę, cyfrę i znak specjalny'
+        email_taken: 'Ten adres e-mail jest już zarejestrowany'
+    plan:
+        item_not_found: 'Nie znaleziono pozycji planu'
+        account_not_found: 'Nie znaleziono konta'
+    general:
+        not_found: 'Nie znaleziono'
+        unauthorized: 'Brak autoryzacji'

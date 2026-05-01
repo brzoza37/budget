@@ -1,0 +1,13 @@
+error:
+    auth:
+        email_required: 'email, password, and displayName are required'
+        display_name_too_long: 'displayName must not exceed 255 characters'
+        invalid_email: 'Invalid email address'
+        password_too_weak: 'Password must be at least 12 characters and contain an uppercase letter, a number, and a special character'
+        email_taken: 'Email already registered'
+    plan:
+        item_not_found: 'PlannedItem not found'
+        account_not_found: 'Account not found'
+    general:
+        not_found: 'Not found'
+        unauthorized: 'Unauthorized'

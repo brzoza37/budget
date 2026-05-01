@@ -261,4 +261,17 @@ class AuthControllerTest extends WebTestCase
         $data = json_decode($client->getResponse()->getContent(), true);
         $this->assertEquals('en', $data['user']['locale']);
     }
+
+    public function testRegisterErrorTranslatedToPolish(): void
+    {
+        $client = static::createClient();
+        $client->request(
+            'POST', '/api/auth/register', [], [],
+            ['CONTENT_TYPE' => 'application/json', 'HTTP_ACCEPT_LANGUAGE' => 'pl'],
+            json_encode(['email' => 'not-an-email', 'password' => self::VALID_PASSWORD, 'displayName' => 'X'])
+        );
+        $this->assertResponseStatusCodeSame(400);
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals('Nieprawidłowy adres e-mail', $data['error']);
+    }
 }
