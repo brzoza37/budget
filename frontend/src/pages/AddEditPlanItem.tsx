@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Box, TextField, Button, Typography, MenuItem, Stack,
   ToggleButton, ToggleButtonGroup, Select, FormControl,
@@ -18,6 +19,7 @@ import apiClient from '../api/apiClient';
 type Mode = 'one-off' | 'recurring';
 
 const AddEditPlanItem = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const isEdit = !!id;
@@ -117,19 +119,19 @@ const AddEditPlanItem = () => {
 
       navigate('/plan');
     } catch {
-      setError('Failed to save. Please try again.');
+      setError(t('plan.saveError'));
     }
   };
 
   const handleDelete = async () => {
-    if (!window.confirm('Delete this planned item?')) return;
+    if (!window.confirm(t('plan.deleteConfirm'))) return;
     await deleteItem.mutateAsync(id!);
     navigate('/plan');
   };
 
   if (loading) {
     return (
-      <Layout title="Plan Item" navigationIcon={<IconButton onClick={() => navigate('/plan')}><BackIcon /></IconButton>}>
+      <Layout title={t('plan.title')} navigationIcon={<IconButton onClick={() => navigate('/plan')}><BackIcon /></IconButton>}>
         <Box display="flex" justifyContent="center" alignItems="center" height="60vh">
           <CircularProgress />
         </Box>
@@ -141,30 +143,30 @@ const AddEditPlanItem = () => {
 
   return (
     <Layout
-      title={isEdit ? 'Edit Plan Item' : 'Add Plan Item'}
+      title={isEdit ? t('plan.editTitle') : t('plan.addTitle')}
       navigationIcon={<IconButton onClick={() => navigate('/plan')}><BackIcon /></IconButton>}
     >
       <Box p={2} component="form" onSubmit={handleSubmit}>
         <Stack spacing={2.5}>
           {!isEdit && (
             <ToggleButtonGroup value={mode} exclusive onChange={(_, v) => v && setMode(v)} size="small" fullWidth>
-              <ToggleButton value="one-off">One-off</ToggleButton>
-              <ToggleButton value="recurring">Recurring</ToggleButton>
+              <ToggleButton value="one-off">{t('plan.modeOneOff')}</ToggleButton>
+              <ToggleButton value="recurring">{t('plan.modeRecurring')}</ToggleButton>
             </ToggleButtonGroup>
           )}
 
           <ToggleButtonGroup value={form.type} exclusive onChange={(_, v) => v && update('type', v)} size="small" fullWidth>
-            <ToggleButton value="EXPENSE">Expense</ToggleButton>
-            <ToggleButton value="INCOME">Income</ToggleButton>
+            <ToggleButton value="EXPENSE">{t('plan.typeExpense')}</ToggleButton>
+            <ToggleButton value="INCOME">{t('plan.typeIncome')}</ToggleButton>
           </ToggleButtonGroup>
 
-          <TextField label="Name" value={form.name} onChange={(e) => update('name', e.target.value)} required fullWidth />
-          <TextField label="Amount" type="number" value={form.amount} onChange={(e) => update('amount', e.target.value)} required fullWidth inputProps={{ min: 0.01, step: 0.01 }} />
+          <TextField label={t('plan.fieldName')} value={form.name} onChange={(e) => update('name', e.target.value)} required fullWidth />
+          <TextField label={t('plan.fieldAmount')} type="number" value={form.amount} onChange={(e) => update('amount', e.target.value)} required fullWidth inputProps={{ min: 0.01, step: 0.01 }} />
 
           <FormControl fullWidth>
-            <InputLabel>Category (optional)</InputLabel>
-            <Select value={form.category} label="Category (optional)" onChange={(e) => update('category', e.target.value)}>
-              <MenuItem value=""><em>None</em></MenuItem>
+            <InputLabel>{t('plan.fieldCategory')}</InputLabel>
+            <Select value={form.category} label={t('plan.fieldCategory')} onChange={(e) => update('category', e.target.value)}>
+              <MenuItem value=""><em>{t('plan.categoryNone')}</em></MenuItem>
               {categories?.filter((c) => c.type === form.type).map((c) => (
                 <MenuItem key={c.id} value={c['@id']}>{c.name}</MenuItem>
               ))}
@@ -172,9 +174,9 @@ const AddEditPlanItem = () => {
           </FormControl>
 
           <FormControl fullWidth>
-            <InputLabel>Account (optional)</InputLabel>
-            <Select value={form.account} label="Account (optional)" onChange={(e) => update('account', e.target.value)}>
-              <MenuItem value=""><em>None</em></MenuItem>
+            <InputLabel>{t('plan.fieldAccount')}</InputLabel>
+            <Select value={form.account} label={t('plan.fieldAccount')} onChange={(e) => update('account', e.target.value)}>
+              <MenuItem value=""><em>{t('plan.accountNone')}</em></MenuItem>
               {accounts?.map((a) => (
                 <MenuItem key={a.id} value={a['@id']}>{a.name}</MenuItem>
               ))}
@@ -183,7 +185,7 @@ const AddEditPlanItem = () => {
 
           {mode === 'one-off' || isEdit ? (
             <TextField
-              label="Due Date"
+              label={t('plan.fieldDueDate')}
               type="date"
               value={form.dueDate}
               onChange={(e) => update('dueDate', e.target.value)}
@@ -194,10 +196,10 @@ const AddEditPlanItem = () => {
           ) : (
             <>
               <Divider />
-              <Typography variant="labelMedium" color="text.secondary">Recurrence</Typography>
+              <Typography variant="labelMedium" color="text.secondary">{t('plan.recurrenceLabel')}</Typography>
               <Box display="flex" gap={1}>
                 <TextField
-                  label="Every"
+                  label={t('plan.recurrenceEvery')}
                   type="number"
                   value={form.repeatEvery}
                   onChange={(e) => update('repeatEvery', e.target.value)}
@@ -205,19 +207,19 @@ const AddEditPlanItem = () => {
                   sx={{ width: 100 }}
                 />
                 <FormControl sx={{ flex: 1 }}>
-                  <InputLabel>Unit</InputLabel>
-                  <Select value={form.repeatUnit} label="Unit" onChange={(e) => update('repeatUnit', e.target.value)}>
-                    <MenuItem value="days">Days</MenuItem>
-                    <MenuItem value="weeks">Weeks</MenuItem>
-                    <MenuItem value="months">Months</MenuItem>
-                    <MenuItem value="years">Years</MenuItem>
+                  <InputLabel>{t('plan.recurrenceUnit')}</InputLabel>
+                  <Select value={form.repeatUnit} label={t('plan.recurrenceUnit')} onChange={(e) => update('repeatUnit', e.target.value)}>
+                    <MenuItem value="days">{t('plan.recurrenceUnitDays')}</MenuItem>
+                    <MenuItem value="weeks">{t('plan.recurrenceUnitWeeks')}</MenuItem>
+                    <MenuItem value="months">{t('plan.recurrenceUnitMonths')}</MenuItem>
+                    <MenuItem value="years">{t('plan.recurrenceUnitYears')}</MenuItem>
                   </Select>
                 </FormControl>
               </Box>
 
               {(form.repeatUnit === 'months' || form.repeatUnit === 'years') && (
                 <TextField
-                  label="On day of month (1–31)"
+                  label={t('plan.recurrenceDayOfMonth')}
                   type="number"
                   value={form.dayOfMonth}
                   onChange={(e) => update('dayOfMonth', e.target.value)}
@@ -227,7 +229,7 @@ const AddEditPlanItem = () => {
               )}
 
               <TextField
-                label="Starting"
+                label={t('plan.recurrenceStarting')}
                 type="date"
                 value={form.startDate}
                 onChange={(e) => update('startDate', e.target.value)}
@@ -237,17 +239,17 @@ const AddEditPlanItem = () => {
             </>
           )}
 
-          <TextField label="Note (optional)" value={form.note} onChange={(e) => update('note', e.target.value)} multiline rows={2} fullWidth />
+          <TextField label={t('plan.fieldNote')} value={form.note} onChange={(e) => update('note', e.target.value)} multiline rows={2} fullWidth />
 
           {error && <Alert severity="error">{error}</Alert>}
 
           <Button variant="contained" type="submit" disabled={isSubmitting} size="large" sx={{ borderRadius: 2, py: 1.5 }}>
-            {isEdit ? 'Update' : mode === 'recurring' ? 'Create Recurring' : 'Add to Plan'}
+            {isEdit ? t('plan.updateButton') : mode === 'recurring' ? t('plan.addRecurringButton') : t('plan.addToPlanButton')}
           </Button>
 
           {isEdit && (
             <Button variant="outlined" color="error" onClick={handleDelete} disabled={deleteItem.isPending}>
-              Delete
+              {t('plan.deleteButton')}
             </Button>
           )}
         </Stack>

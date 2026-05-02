@@ -14,3 +14,7 @@ error:
     general:
         not_found: 'Nie znaleziono'
         unauthorized: 'Brak autoryzacji'
+category:
+    default:
+        general: 'Ogólne'
+        salary: 'Wynagrodzenie'

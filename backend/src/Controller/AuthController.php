@@ -63,14 +63,14 @@ class AuthController extends AbstractController
         $em->persist($user);
 
         $generalCategory = (new Category())
-            ->setName('General')
+            ->setName($this->translator->trans('category.default.general', [], null, $locale))
             ->setType('EXPENSE')
             ->setColor('#9E9E9E')
             ->setIcon('category')
             ->setUser($user);
 
         $salaryCategory = (new Category())
-            ->setName('Salary')
+            ->setName($this->translator->trans('category.default.salary', [], null, $locale))
             ->setType('INCOME')
             ->setColor('#4CAF50')
             ->setIcon('payments')

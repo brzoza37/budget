@@ -14,3 +14,7 @@ error:
     general:
         not_found: 'Not found'
         unauthorized: 'Unauthorized'
+category:
+    default:
+        general: 'General'
+        salary: 'Salary'

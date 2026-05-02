@@ -11,6 +11,7 @@ import {
 } from '@mui/material';
 import { Delete as DeleteIcon, ArrowBack as ArrowBackIcon } from '@mui/icons-material';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import Layout from '../components/Layout';
 import {
   useCategories,
@@ -20,16 +21,12 @@ import {
   useDeleteBudget,
 } from '../hooks/useApi';
 
-const MONTHS = [
-  { value: 1, label: 'January' }, { value: 2, label: 'February' },
-  { value: 3, label: 'March' }, { value: 4, label: 'April' },
-  { value: 5, label: 'May' }, { value: 6, label: 'June' },
-  { value: 7, label: 'July' }, { value: 8, label: 'August' },
-  { value: 9, label: 'September' }, { value: 10, label: 'October' },
-  { value: 11, label: 'November' }, { value: 12, label: 'December' },
-];
-
 const AddEditBudget = () => {
+  const { t, i18n } = useTranslation();
+  const months = Array.from({ length: 12 }, (_, i) => ({
+    value: i + 1,
+    label: new Intl.DateTimeFormat(i18n.language, { month: 'long' }).format(new Date(2000, i, 1)),
+  }));
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const isEdit = !!id;
@@ -80,7 +77,7 @@ const AddEditBudget = () => {
   };
 
   const handleDelete = async () => {
-    if (window.confirm('Delete this budget?')) {
+    if (window.confirm(t('budget.deleteConfirm'))) {
       try {
         await deleteMutation.mutateAsync(id!);
         navigate('/budget');
@@ -92,7 +89,7 @@ const AddEditBudget = () => {
 
   if (categoriesLoading || (isEdit && budgetLoading)) {
     return (
-      <Layout title={isEdit ? 'Edit Budget' : 'Add Budget'}>
+      <Layout title={isEdit ? t('budget.editTitle') : t('budget.addTitle')}>
         <Box display="flex" justifyContent="center" alignItems="center" height="80vh">
           <CircularProgress />
         </Box>
@@ -102,7 +99,7 @@ const AddEditBudget = () => {
 
   return (
     <Layout
-      title={isEdit ? 'Edit Budget' : 'Add Budget'}
+      title={isEdit ? t('budget.editTitle') : t('budget.addTitle')}
       navigationIcon={<IconButton onClick={() => navigate(-1)}><ArrowBackIcon /></IconButton>}
       actions={
         isEdit ? (
@@ -115,13 +112,13 @@ const AddEditBudget = () => {
       <Box p={2} component="form" onSubmit={handleSubmit}>
         <Stack spacing={3}>
           <TextField
-            fullWidth label="Amount" type="number"
+            fullWidth label={t('budget.fieldAmount')} type="number"
             value={formData.amount}
             onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
             required variant="outlined" inputProps={{ step: '0.01', min: '0' }}
           />
           <TextField
-            fullWidth select label="Category"
+            fullWidth select label={t('budget.fieldCategory')}
             value={formData.category}
             onChange={(e) => setFormData({ ...formData, category: e.target.value })}
             required variant="outlined" disabled={isEdit}
@@ -131,30 +128,30 @@ const AddEditBudget = () => {
             ))}
           </TextField>
           <TextField
-            fullWidth select label="Month"
+            fullWidth select label={t('budget.fieldMonth')}
             value={formData.month}
             onChange={(e) => setFormData({ ...formData, month: Number(e.target.value) })}
             required variant="outlined"
           >
-            {MONTHS.map((m) => (
+            {months.map((m) => (
               <MenuItem key={m.value} value={m.value}>{m.label}</MenuItem>
             ))}
           </TextField>
           <TextField
-            fullWidth label="Year" type="number"
+            fullWidth label={t('budget.fieldYear')} type="number"
             value={formData.year}
             onChange={(e) => setFormData({ ...formData, year: Number(e.target.value) })}
             required variant="outlined" inputProps={{ min: 2020, max: 2100 }}
           />
           {(createMutation.isError || updateMutation.isError) && (
-            <Alert severity="error">An error occurred while saving the budget.</Alert>
+            <Alert severity="error">{t('budget.saveError')}</Alert>
           )}
           <Button
             fullWidth variant="contained" size="large" type="submit"
             disabled={createMutation.isPending || updateMutation.isPending}
             sx={{ mt: 2, borderRadius: 2, py: 1.5 }}
           >
-            {isEdit ? 'Update Budget' : 'Add Budget'}
+            {isEdit ? t('budget.updateButton') : t('budget.saveButton')}
           </Button>
         </Stack>
       </Box>

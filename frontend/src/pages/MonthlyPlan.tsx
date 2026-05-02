@@ -221,7 +221,7 @@ const PlanItemRow = ({
           <Typography variant="labelSmall" color="text.secondary">
             {t('plan.due', { date: new Date(item.dueDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) })}
             {item.category?.name && ` • ${item.category.name}`}
-            {isPartial && ` • ${formatAmount(item.paidAmount!, currency)} paid`}
+            {isPartial && ` • ${formatAmount(item.paidAmount!, currency)} ${t('plan.paidSuffix')}`}
           </Typography>
         </Box>
 

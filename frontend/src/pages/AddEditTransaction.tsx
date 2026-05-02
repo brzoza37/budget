@@ -15,6 +15,7 @@ import {
   ArrowBack as ArrowBackIcon,
   Check as SaveIcon,
 } from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import Layout from '../components/Layout';
 import { 
@@ -26,6 +27,7 @@ import {
 } from '../hooks/useApi';
 
 const AddEditTransaction = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { id } = useParams();
   const isEdit = !!id;
@@ -85,7 +87,7 @@ const AddEditTransaction = () => {
 
   if (isLoading) {
     return (
-      <Layout title={isEdit ? "Edit Transaction" : "Add Transaction"}>
+      <Layout title={isEdit ? t('transactions.editTitle') : t('transactions.addTitle')}>
         <Box display="flex" justifyContent="center" alignItems="center" height="80vh">
           <CircularProgress />
         </Box>
@@ -95,7 +97,7 @@ const AddEditTransaction = () => {
 
   return (
     <Layout
-      title={isEdit ? "Edit Transaction" : "Add Transaction"}
+      title={isEdit ? t('transactions.editTitle') : t('transactions.addTitle')}
       navigationIcon={
         <IconButton onClick={() => navigate(-1)}>
           <ArrowBackIcon />
@@ -116,13 +118,13 @@ const AddEditTransaction = () => {
             fullWidth
             color="primary"
           >
-            <ToggleButton value="INCOME">Income</ToggleButton>
-            <ToggleButton value="EXPENSE">Expense</ToggleButton>
-            <ToggleButton value="TRANSFER">Transfer</ToggleButton>
+            <ToggleButton value="INCOME">{t('transactions.income')}</ToggleButton>
+            <ToggleButton value="EXPENSE">{t('transactions.expense')}</ToggleButton>
+            <ToggleButton value="TRANSFER">{t('transactions.transfer')}</ToggleButton>
           </ToggleButtonGroup>
 
           <TextField
-            label="Amount"
+            label={t('transactions.fieldAmount')}
             variant="outlined"
             fullWidth
             type="number"
@@ -132,7 +134,7 @@ const AddEditTransaction = () => {
           />
 
           <TextField
-            label="Date"
+            label={t('transactions.fieldDate')}
             variant="outlined"
             fullWidth
             type="date"
@@ -143,7 +145,7 @@ const AddEditTransaction = () => {
 
           <TextField
             select
-            label="Account"
+            label={t('transactions.fieldAccount')}
             value={accountId}
             onChange={(e) => setAccountId(e.target.value)}
             fullWidth
@@ -158,7 +160,7 @@ const AddEditTransaction = () => {
           {type === 'TRANSFER' ? (
             <TextField
               select
-              label="To Account"
+              label={t('transactions.fieldToAccount')}
               value={toAccountId}
               onChange={(e) => setToAccountId(e.target.value)}
               fullWidth
@@ -172,12 +174,12 @@ const AddEditTransaction = () => {
           ) : (
             <TextField
               select
-              label="Category (optional)"
+              label={t('transactions.fieldCategory')}
               value={categoryId}
               onChange={(e) => setCategoryId(e.target.value)}
               fullWidth
             >
-              <MenuItem value="">— None —</MenuItem>
+              <MenuItem value="">{t('transactions.categoryNone')}</MenuItem>
               {filteredCategories.map((option) => (
                 <MenuItem key={option['@id']} value={option['@id']}>
                   {option.name}
@@ -187,7 +189,7 @@ const AddEditTransaction = () => {
           )}
 
           <TextField
-            label="Note (optional)"
+            label={t('transactions.fieldNote')}
             variant="outlined"
             fullWidth
             multiline
@@ -203,7 +205,7 @@ const AddEditTransaction = () => {
             disabled={createMutation.isPending || updateMutation.isPending}
             sx={{ mt: 2, height: 56, borderRadius: 3 }}
           >
-            {isEdit ? "Update Transaction" : "Save Transaction"}
+            {isEdit ? t('transactions.updateButton') : t('transactions.saveButton')}
           </Button>
         </Stack>
       </Box>
