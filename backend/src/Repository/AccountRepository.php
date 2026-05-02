@@ -17,21 +17,43 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class AccountRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
+    public function __construct(
+        ManagerRegistry $registry,
+        private readonly ExchangeRateRepository $exchangeRateRepository,
+    ) {
         parent::__construct($registry, Account::class);
     }
 
-    public function getTotalBalance(User $user): float
+    /**
+     * @return array{total: float, missingCurrencies: string[]}
+     */
+    public function getTotalBalance(User $user): array
     {
-        $result = $this->createQueryBuilder('a')
-            ->select('COALESCE(SUM(a.balance), 0) as total')
+        $rows = $this->createQueryBuilder('a')
+            ->select('a.balance', 'a.currency')
             ->where('a.isArchived = false')
             ->andWhere('a.user = :user')
             ->setParameter('user', $user)
             ->getQuery()
-            ->getSingleResult();
+            ->getArrayResult();
 
-        return (float) $result['total'];
+        $userCurrency = $user->getCurrency();
+        $total = 0.0;
+        $missingCurrencies = [];
+
+        foreach ($rows as $row) {
+            $converted = $this->exchangeRateRepository->convert(
+                (float) $row['balance'],
+                $row['currency'],
+                $userCurrency
+            );
+            if ($converted === null) {
+                $missingCurrencies[] = $row['currency'];
+            } else {
+                $total += $converted;
+            }
+        }
+
+        return ['total' => $total, 'missingCurrencies' => $missingCurrencies];
     }
 }
