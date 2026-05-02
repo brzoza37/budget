@@ -9,26 +9,24 @@ use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @extends ServiceEntityRepository<Transaction>
- *
- * @method Transaction|null find($id, $lockMode = null, $lockVersion = null)
- * @method Transaction|null findOneBy(array $criteria, array $orderBy = null)
- * @method Transaction[]    findAll()
- * @method Transaction[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class TransactionRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
+    public function __construct(
+        ManagerRegistry $registry,
+        private readonly ExchangeRateRepository $exchangeRateRepository,
+    ) {
         parent::__construct($registry, Transaction::class);
     }
 
     public function getMonthlyTotal(string $type, int $month, int $year, User $user): float
     {
         $start = new \DateTimeImmutable(sprintf('%d-%02d-01', $year, $month));
-        $end = $start->modify('first day of next month');
+        $end   = $start->modify('first day of next month');
 
-        $result = $this->createQueryBuilder('t')
-            ->select('COALESCE(SUM(t.amount), 0) as total')
+        $rows = $this->createQueryBuilder('t')
+            ->select('t.amount', 'a.currency')
+            ->join('t.account', 'a')
             ->where('t.type = :type')
             ->andWhere('t.date >= :start')
             ->andWhere('t.date < :end')
@@ -38,15 +36,25 @@ class TransactionRepository extends ServiceEntityRepository
             ->setParameter('end', $end)
             ->setParameter('user', $user)
             ->getQuery()
-            ->getSingleResult();
+            ->getArrayResult();
 
-        return (float) $result['total'];
+        $userCurrency = $user->getCurrency();
+        $total = 0.0;
+        foreach ($rows as $row) {
+            $converted = $this->exchangeRateRepository->convert(
+                (float) $row['amount'],
+                $row['currency'],
+                $userCurrency
+            );
+            $total += $converted ?? (float) $row['amount'];
+        }
+        return $total;
     }
 
     public function getSpentForBudget(int $categoryId, int $month, int $year, User $user): float
     {
         $start = new \DateTimeImmutable(sprintf('%d-%02d-01', $year, $month));
-        $end = $start->modify('first day of next month');
+        $end   = $start->modify('first day of next month');
 
         $result = $this->createQueryBuilder('t')
             ->select('COALESCE(SUM(t.amount), 0) as spent')

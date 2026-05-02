@@ -102,4 +102,38 @@ class StatsControllerTest extends WebTestCase
         $this->assertContains('GBP', $data['missingRates']);
         $this->assertEqualsWithDelta(0.0, $data['totalBalance'], 0.01);
     }
+
+    public function testMonthlyIncomeConvertedToUserCurrency(): void
+    {
+        $client = static::createClient();
+        [$token, $userId] = $this->registerAndGetToken($client);
+
+        $em = static::getContainer()->get('doctrine.orm.entity_manager');
+        $user = $em->getRepository(User::class)->find($userId);
+
+        // EUR→USD = 1.08 (user.currency = USD)
+        $er = (new ExchangeRate())->setTargetCurrency('USD')->setRate(1.08)->setFetchedAt(new \DateTimeImmutable());
+        $em->persist($er);
+
+        $eurAccount = (new Account())->setName('EUR')->setType('SAVINGS')->setCurrency('EUR')->setBalance(0.0)->setColor('#000')->setIcon('bank')->setUser($user);
+        $em->persist($eurAccount);
+        $em->flush();
+
+        // Add EUR income transaction: 100 EUR = 108 USD
+        $client->request('POST', '/api/transactions', [], [],
+            ['CONTENT_TYPE' => 'application/ld+json', 'HTTP_AUTHORIZATION' => "Bearer $token"],
+            json_encode([
+                'type' => 'INCOME',
+                'amount' => 100.0,
+                'account' => '/api/accounts/' . $eurAccount->getId(),
+                'date' => '2026-05-15T00:00:00+00:00',
+            ])
+        );
+        $this->assertResponseStatusCodeSame(201);
+
+        $client->request('GET', '/api/stats/summary?year=2026&month=5', [], [], ['HTTP_AUTHORIZATION' => "Bearer $token"]);
+        $this->assertResponseIsSuccessful();
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEqualsWithDelta(108.0, $data['monthlyIncome'], 0.01);
+    }
 }
