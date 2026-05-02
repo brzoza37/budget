@@ -56,14 +56,16 @@ const AddEditTransaction = () => {
     }
   }, [transaction]);
 
-  const filteredCategories = categories?.filter(c => c.type === (type === 'TRANSFER' ? 'EXPENSE' : type)) || [];
+  const filteredCategories = categories?.filter(
+    c => !c.isArchived && c.type === (type === 'TRANSFER' ? 'EXPENSE' : type)
+  ) || [];
 
   const handleSave = async () => {
     const payload = {
       type,
       amount: parseFloat(amount),
       account: accountId,
-      category: type === 'TRANSFER' ? undefined : categoryId,
+      category: type === 'TRANSFER' ? undefined : (categoryId || undefined),
       toAccount: type === 'TRANSFER' ? toAccountId : undefined,
       note,
       date: new Date(date).toISOString(),
@@ -170,12 +172,12 @@ const AddEditTransaction = () => {
           ) : (
             <TextField
               select
-              label="Category"
+              label="Category (optional)"
               value={categoryId}
               onChange={(e) => setCategoryId(e.target.value)}
               fullWidth
-              disabled={filteredCategories.length === 0}
             >
+              <MenuItem value="">— None —</MenuItem>
               {filteredCategories.map((option) => (
                 <MenuItem key={option['@id']} value={option['@id']}>
                   {option.name}
