@@ -8,7 +8,12 @@ use App\Entity\User;
 use App\Repository\TransactionRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
+#[Assert\Expression(
+    "(this.getOriginalCurrency() === null) === (this.getOriginalAmount() === null)",
+    message: "originalCurrency and originalAmount must both be set or both be null"
+)]
 #[ORM\Entity(repositoryClass: TransactionRepository::class)]
 #[ApiResource(
     security: "is_granted('ROLE_USER')",
@@ -59,6 +64,14 @@ class Transaction
     #[ORM\Column(type: 'text', nullable: true)]
     #[Groups(['transaction:read', 'transaction:write'])]
     private ?string $note = null;
+
+    #[ORM\Column(length: 3, nullable: true)]
+    #[Groups(['transaction:read', 'transaction:write'])]
+    private ?string $originalCurrency = null;
+
+    #[ORM\Column(nullable: true)]
+    #[Groups(['transaction:read', 'transaction:write'])]
+    private ?float $originalAmount = null;
 
     #[ORM\Column]
     #[Groups(['transaction:read', 'transaction:write'])]
@@ -161,6 +174,12 @@ class Transaction
         $this->note = $note;
         return $this;
     }
+
+    public function getOriginalCurrency(): ?string { return $this->originalCurrency; }
+    public function setOriginalCurrency(?string $v): static { $this->originalCurrency = $v; return $this; }
+
+    public function getOriginalAmount(): ?float { return $this->originalAmount; }
+    public function setOriginalAmount(?float $v): static { $this->originalAmount = $v; return $this; }
 
     public function getDate(): ?\DateTimeImmutable
     {
