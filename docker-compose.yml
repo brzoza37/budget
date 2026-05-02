@@ -48,5 +48,19 @@ services:
       - backend
       - frontend
 
+  worker:
+    build:
+      context: ./backend
+      dockerfile: ../docker/php/Dockerfile
+    command: sh -c "cd /var/www/html && php bin/console messenger:consume scheduler_default --time-limit=3600"
+    restart: unless-stopped
+    volumes:
+      - ./backend:/var/www/html
+    environment:
+      DATABASE_URL: postgresql://user:password@db:5432/budget?serverVersion=16&charset=utf8
+      APP_ENV: dev
+    depends_on:
+      - db
+
 volumes:
   db-data:
