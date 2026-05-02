@@ -234,14 +234,14 @@ const AddEditTransaction = () => {
                 onClick={() => setShowOriginal(v => !v)}
                 sx={{ px: 0, color: 'text.secondary' }}
               >
-                {showOriginal ? '▲ Hide foreign currency' : '▼ Paid in foreign currency?'}
+                {showOriginal ? '▲ ' + t('transactions.hideForeignCurrency') : '▼ ' + t('transactions.paidInForeignCurrency')}
               </Button>
               <Collapse in={showOriginal}>
                 <Stack spacing={2} mt={1.5}>
                   <Stack direction="row" spacing={2}>
                     <TextField
                       select
-                      label="Original currency"
+                      label={t('transactions.originalCurrency')}
                       value={originalCurrency}
                       onChange={(e) => setOriginalCurrency(e.target.value)}
                       sx={{ width: 160 }}
@@ -251,7 +251,7 @@ const AddEditTransaction = () => {
                       ))}
                     </TextField>
                     <TextField
-                      label="Original amount"
+                      label={t('transactions.originalAmount')}
                       type="number"
                       value={originalAmount}
                       onChange={(e) => setOriginalAmount(e.target.value)}
@@ -261,7 +261,7 @@ const AddEditTransaction = () => {
                   </Stack>
                   {derivedRate && (
                     <Typography variant="caption" color="text.secondary">
-                      Rate: {derivedRate}
+                      {t('transactions.rate')}: {derivedRate}
                     </Typography>
                   )}
                 </Stack>

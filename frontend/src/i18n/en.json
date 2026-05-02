@@ -42,7 +42,12 @@
     "categoryNone": "— None —",
     "fieldNote": "Note (optional)",
     "saveButton": "Save Transaction",
-    "updateButton": "Update Transaction"
+    "updateButton": "Update Transaction",
+    "hideForeignCurrency": "Hide foreign currency",
+    "paidInForeignCurrency": "Paid in foreign currency?",
+    "originalCurrency": "Original currency",
+    "originalAmount": "Original amount",
+    "rate": "Rate"
   },
   "plan": {
     "title": "Monthly Plan",

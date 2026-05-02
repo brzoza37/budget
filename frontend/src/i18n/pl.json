@@ -42,7 +42,12 @@
     "categoryNone": "— Brak —",
     "fieldNote": "Notatka (opcjonalnie)",
     "saveButton": "Zapisz transakcję",
-    "updateButton": "Zaktualizuj transakcję"
+    "updateButton": "Zaktualizuj transakcję",
+    "hideForeignCurrency": "Ukryj walutę oryginalną",
+    "paidInForeignCurrency": "Zapłacono w innej walucie?",
+    "originalCurrency": "Waluta oryginalna",
+    "originalAmount": "Kwota oryginalna",
+    "rate": "Kurs"
   },
   "plan": {
     "title": "Plan miesięczny",
