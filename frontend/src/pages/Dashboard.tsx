@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   Box, Typography, Card, CardContent, IconButton, Fab,
-  CircularProgress, Stack,
+  CircularProgress, Stack, Alert,
 } from '@mui/material';
 import {
   Add as AddIcon, AccountBalance as AccountIcon,
@@ -55,6 +55,11 @@ const Dashboard = () => {
         </>
       }
     >
+      {stats?.missingRates && stats.missingRates.length > 0 && (
+        <Alert severity="warning" sx={{ mx: 2, mt: 1 }}>
+          Balance may be incomplete — exchange rate unavailable for: {stats.missingRates.join(', ')}
+        </Alert>
+      )}
       <Box p={2}>
         {/* Total Balance */}
         <Card sx={{ bgcolor: 'primary.main', color: 'primary.contrastText', mb: 2 }}>

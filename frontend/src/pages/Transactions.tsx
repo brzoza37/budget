@@ -226,6 +226,11 @@ const TransactionListItem = ({
             <Typography variant="body2" sx={{ fontWeight: 'bold', color }}>
               {prefix}{formatAmount(transaction.amount, currency)}
             </Typography>
+            {transaction.originalCurrency && transaction.originalAmount != null && (
+              <Typography variant="caption" display="block" color="text.secondary" textAlign="right">
+                {formatAmount(transaction.originalAmount, transaction.originalCurrency)}
+              </Typography>
+            )}
           </Box>
           <IconButton
             size="small"
