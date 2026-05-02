@@ -10,6 +10,7 @@ import {
   ToggleButtonGroup,
   Button,
   CircularProgress,
+  Collapse,
 } from '@mui/material';
 import {
   ArrowBack as ArrowBackIcon,
@@ -25,6 +26,8 @@ import {
   useCreateTransaction, 
   useUpdateTransaction 
 } from '../hooks/useApi';
+
+const CURRENCIES = ['USD', 'EUR', 'GBP', 'PLN', 'JPY', 'CAD', 'AUD', 'CHF', 'CNY'];
 
 const AddEditTransaction = () => {
   const { t } = useTranslation();
@@ -45,6 +48,9 @@ const AddEditTransaction = () => {
   const [toAccountId, setToAccountId] = useState('');
   const [note, setNote] = useState('');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const [showOriginal, setShowOriginal] = useState(false);
+  const [originalCurrency, setOriginalCurrency] = useState('EUR');
+  const [originalAmount, setOriginalAmount] = useState('');
 
   useEffect(() => {
     if (transaction) {
@@ -55,6 +61,11 @@ const AddEditTransaction = () => {
       setToAccountId(transaction.toAccount?.['@id'] || '');
       setNote(transaction.note || '');
       setDate(transaction.date.split('T')[0]);
+      if (transaction.originalCurrency && transaction.originalAmount != null) {
+        setShowOriginal(true);
+        setOriginalCurrency(transaction.originalCurrency);
+        setOriginalAmount(transaction.originalAmount.toString());
+      }
     }
   }, [transaction]);
 
@@ -62,8 +73,17 @@ const AddEditTransaction = () => {
     c => !c.isArchived && c.type === (type === 'TRANSFER' ? 'EXPENSE' : type)
   ) || [];
 
+  const derivedRate = (() => {
+    const a = parseFloat(amount);
+    const o = parseFloat(originalAmount);
+    if (!showOriginal || !a || !o) return null;
+    const accountCurrency = accounts?.find(ac => ac['@id'] === accountId)?.currency ?? '';
+    if (!accountCurrency) return null;
+    return `1 ${originalCurrency} = ${(a / o).toFixed(4)} ${accountCurrency}`;
+  })();
+
   const handleSave = async () => {
-    const payload = {
+    const payload: Record<string, unknown> = {
       type,
       amount: parseFloat(amount),
       account: accountId,
@@ -72,6 +92,14 @@ const AddEditTransaction = () => {
       note,
       date: new Date(date).toISOString(),
     };
+
+    if (showOriginal && originalCurrency && originalAmount) {
+      payload.originalCurrency = originalCurrency;
+      payload.originalAmount = parseFloat(originalAmount);
+    } else {
+      payload.originalCurrency = null;
+      payload.originalAmount = null;
+    }
 
     if (isEdit) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -198,7 +226,50 @@ const AddEditTransaction = () => {
             onChange={(e) => setNote(e.target.value)}
           />
 
-          <Button 
+          {type !== 'TRANSFER' && (
+            <Box>
+              <Button
+                variant="text"
+                size="small"
+                onClick={() => setShowOriginal(v => !v)}
+                sx={{ px: 0, color: 'text.secondary' }}
+              >
+                {showOriginal ? '▲ Hide foreign currency' : '▼ Paid in foreign currency?'}
+              </Button>
+              <Collapse in={showOriginal}>
+                <Stack spacing={2} mt={1.5}>
+                  <Stack direction="row" spacing={2}>
+                    <TextField
+                      select
+                      label="Original currency"
+                      value={originalCurrency}
+                      onChange={(e) => setOriginalCurrency(e.target.value)}
+                      sx={{ width: 160 }}
+                    >
+                      {CURRENCIES.map(c => (
+                        <MenuItem key={c} value={c}>{c}</MenuItem>
+                      ))}
+                    </TextField>
+                    <TextField
+                      label="Original amount"
+                      type="number"
+                      value={originalAmount}
+                      onChange={(e) => setOriginalAmount(e.target.value)}
+                      inputProps={{ step: '0.01' }}
+                      fullWidth
+                    />
+                  </Stack>
+                  {derivedRate && (
+                    <Typography variant="caption" color="text.secondary">
+                      Rate: {derivedRate}
+                    </Typography>
+                  )}
+                </Stack>
+              </Collapse>
+            </Box>
+          )}
+
+          <Button
             variant="contained" 
             size="large" 
             onClick={handleSave}

@@ -33,6 +33,8 @@ export interface Transaction {
   note?: string;
   date: string;
   plannedItem?: { id: number };
+  originalCurrency?: string | null;
+  originalAmount?: number | null;
   createdAt?: string;
 }
 
@@ -95,6 +97,7 @@ export interface StatsSummary {
   plannedIncomeThisMonth: number;
   plannedExpensesThisMonth: number;
   forecastedBalance: number;
+  missingRates: string[];
 }
 
 export interface MonthlyTrendItem {
