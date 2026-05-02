@@ -16,7 +16,8 @@
     "expenses": "Expenses",
     "recentTransactions": "Recent Transactions",
     "noTransactions": "No transactions yet.\nTap + to add one!",
-    "seeAll": "See all"
+    "seeAll": "See all",
+    "missingRatesWarning": "Balance may be incomplete — exchange rate unavailable for: {{currencies}}"
   },
   "transactions": {
     "title": "Transactions",

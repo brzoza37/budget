@@ -57,7 +57,7 @@ const Dashboard = () => {
     >
       {stats?.missingRates && stats.missingRates.length > 0 && (
         <Alert severity="warning" sx={{ mx: 2, mt: 1 }}>
-          Balance may be incomplete — exchange rate unavailable for: {stats.missingRates.join(', ')}
+          {t('dashboard.missingRatesWarning', { currencies: stats.missingRates.join(', ') })}
         </Alert>
       )}
       <Box p={2}>

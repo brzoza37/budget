@@ -16,7 +16,8 @@
     "expenses": "Wydatki",
     "recentTransactions": "Ostatnie transakcje",
     "noTransactions": "Brak transakcji.\nDotknij + aby dodać!",
-    "seeAll": "Zobacz wszystkie"
+    "seeAll": "Zobacz wszystkie",
+    "missingRatesWarning": "Saldo może być niepełne — brak kursu wymiany dla: {{currencies}}"
   },
   "transactions": {
     "title": "Transakcje",
