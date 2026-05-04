@@ -4,6 +4,7 @@ namespace App\Tests\Command;
 
 use App\Command\UpdateExchangeRatesCommand;
 use App\Entity\ExchangeRate;
+use App\Repository\ExchangeRateRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -28,16 +29,25 @@ class UpdateExchangeRatesCommandTest extends KernelTestCase
         return new CommandTester($command);
     }
 
+    /** @return ExchangeRateRepository */
+    private function repo(): ExchangeRateRepository
+    {
+        /** @var ExchangeRateRepository $repo */
+        $repo = $this->em->getRepository(ExchangeRate::class);
+        return $repo;
+    }
+
     public function testInsertsRatesOnFirstRun(): void
     {
-        $body = json_encode(['base' => 'EUR', 'rates' => ['USD' => 1.08, 'PLN' => 4.25]]);
+        $body = (string) json_encode(['base' => 'EUR', 'rates' => ['USD' => 1.08, 'PLN' => 4.25]]);
         $tester = $this->makeCommand(new MockHttpClient(new MockResponse($body)));
         $tester->execute([]);
         $tester->assertCommandIsSuccessful();
 
-        $rates = $this->em->getRepository(ExchangeRate::class)->findAll();
+        $rates = $this->repo()->findAll();
         $this->assertCount(2, $rates);
-        $usd = $this->em->getRepository(ExchangeRate::class)->findOneBy(['targetCurrency' => 'USD']);
+        $usd = $this->repo()->findOneBy(['targetCurrency' => 'USD']);
+        $this->assertNotNull($usd);
         $this->assertEqualsWithDelta(1.08, $usd->getRate(), 0.001);
     }
 
@@ -47,12 +57,12 @@ class UpdateExchangeRatesCommandTest extends KernelTestCase
         $this->em->persist($old);
         $this->em->flush();
 
-        $body = json_encode(['base' => 'EUR', 'rates' => ['USD' => 1.08]]);
+        $body = (string) json_encode(['base' => 'EUR', 'rates' => ['USD' => 1.08]]);
         $tester = $this->makeCommand(new MockHttpClient(new MockResponse($body)));
         $tester->execute([]);
         $tester->assertCommandIsSuccessful();
 
-        $all = $this->em->getRepository(ExchangeRate::class)->findAll();
+        $all = $this->repo()->findAll();
         $this->assertCount(1, $all);
         $this->assertEqualsWithDelta(1.08, $all[0]->getRate(), 0.001);
     }
@@ -62,6 +72,6 @@ class UpdateExchangeRatesCommandTest extends KernelTestCase
         $tester = $this->makeCommand(new MockHttpClient(new MockResponse('error', ['http_code' => 500])));
         $tester->execute([]);
         $tester->assertCommandIsSuccessful();
-        $this->assertCount(0, $this->em->getRepository(ExchangeRate::class)->findAll());
+        $this->assertCount(0, $this->repo()->findAll());
     }
 }

@@ -28,14 +28,16 @@ class SecurityTest extends WebTestCase
     public function testAuthenticatedRequestSucceeds(): void
     {
         $client = static::createClient();
-        $client->request('POST', '/api/auth/register', [], [], ['CONTENT_TYPE' => 'application/json'], json_encode([
+        $client->request('POST', '/api/auth/register', [], [], ['CONTENT_TYPE' => 'application/json'], (string) json_encode([
             'email' => 'scope@example.com',
             'password' => 'Secret123!@#',
             'displayName' => 'Scope User',
         ]));
-        $token = json_decode($client->getResponse()->getContent(), true)['token'];
+        /** @var array{token: string} $decoded */
+        $decoded = json_decode((string) $client->getResponse()->getContent(), true);
+        $token = $decoded['token'];
         $client->request('GET', '/api/accounts', [], [], [
-            'HTTP_AUTHORIZATION' => "Bearer $token",
+            'HTTP_AUTHORIZATION' => "Bearer {$token}",
             'HTTP_ACCEPT' => 'application/ld+json',
         ]);
         $this->assertResponseIsSuccessful();

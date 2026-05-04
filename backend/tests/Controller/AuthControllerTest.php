@@ -3,6 +3,7 @@
 namespace App\Tests\Controller;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class AuthControllerTest extends WebTestCase
@@ -20,13 +21,28 @@ class AuthControllerTest extends WebTestCase
         static::ensureKernelShutdown();
     }
 
-    private function jsonPost(object $client, string $url, array $data): void
+    /** @param array<string, mixed> $data */
+    private function jsonPost(KernelBrowser $client, string $url, array $data): void
     {
         $client->request(
             'POST', $url, [], [],
             ['CONTENT_TYPE' => 'application/json'],
-            json_encode($data)
+            (string) json_encode($data)
         );
+    }
+
+    /** @return array<string, mixed> */
+    private function jsonDecode(string|false $content): array
+    {
+        /** @var array<string, mixed> */
+        return json_decode((string) $content, true) ?? [];
+    }
+
+    private function getTokenFromResponse(KernelBrowser $client): string
+    {
+        /** @var array{token: string} $data */
+        $data = $this->jsonDecode($client->getResponse()->getContent());
+        return $data['token'];
     }
 
     public function testRegisterReturnsTokenAndUser(): void
@@ -38,7 +54,8 @@ class AuthControllerTest extends WebTestCase
             'displayName' => 'Test User',
         ]);
         $this->assertResponseStatusCodeSame(201);
-        $data = json_decode($client->getResponse()->getContent(), true);
+        /** @var array{token: string, user: array{email: string, displayName: string, currency: string}} $data */
+        $data = $this->jsonDecode($client->getResponse()->getContent());
         $this->assertArrayHasKey('token', $data);
         $this->assertArrayHasKey('user', $data);
         $this->assertEquals('test@example.com', $data['user']['email']);
@@ -91,7 +108,7 @@ class AuthControllerTest extends WebTestCase
             'password' => self::VALID_PASSWORD,
         ]);
         $this->assertResponseIsSuccessful();
-        $data = json_decode($client->getResponse()->getContent(), true);
+        $data = $this->jsonDecode($client->getResponse()->getContent());
         $this->assertArrayHasKey('token', $data);
         $this->assertArrayHasKey('user', $data);
     }
@@ -126,12 +143,13 @@ class AuthControllerTest extends WebTestCase
             'password' => self::VALID_PASSWORD,
             'displayName' => 'Me User',
         ]);
-        $token = json_decode($client->getResponse()->getContent(), true)['token'];
+        $token = $this->getTokenFromResponse($client);
         $client->request('GET', '/api/auth/me', [], [], [
-            'HTTP_AUTHORIZATION' => "Bearer $token",
+            'HTTP_AUTHORIZATION' => "Bearer {$token}",
         ]);
         $this->assertResponseIsSuccessful();
-        $data = json_decode($client->getResponse()->getContent(), true);
+        /** @var array{email: string, displayName: string} $data */
+        $data = $this->jsonDecode($client->getResponse()->getContent());
         $this->assertEquals('me@example.com', $data['email']);
         $this->assertEquals('Me User', $data['displayName']);
     }
@@ -145,7 +163,8 @@ class AuthControllerTest extends WebTestCase
             'displayName' => 'Locale User',
         ]);
         $this->assertResponseStatusCodeSame(201);
-        $data = json_decode($client->getResponse()->getContent(), true);
+        /** @var array{user: array{locale: string}} $data */
+        $data = $this->jsonDecode($client->getResponse()->getContent());
         $this->assertEquals('en', $data['user']['locale']);
     }
 
@@ -159,7 +178,8 @@ class AuthControllerTest extends WebTestCase
             'locale' => 'pl',
         ]);
         $this->assertResponseStatusCodeSame(201);
-        $data = json_decode($client->getResponse()->getContent(), true);
+        /** @var array{user: array{locale: string}} $data */
+        $data = $this->jsonDecode($client->getResponse()->getContent());
         $this->assertEquals('pl', $data['user']['locale']);
     }
 
@@ -177,7 +197,8 @@ class AuthControllerTest extends WebTestCase
             'password' => self::VALID_PASSWORD,
         ]);
         $this->assertResponseIsSuccessful();
-        $data = json_decode($client->getResponse()->getContent(), true);
+        /** @var array{user: array{locale: string}} $data */
+        $data = $this->jsonDecode($client->getResponse()->getContent());
         $this->assertEquals('pl', $data['user']['locale']);
     }
 
@@ -189,12 +210,13 @@ class AuthControllerTest extends WebTestCase
             'password' => self::VALID_PASSWORD,
             'displayName' => 'Me Locale',
         ]);
-        $token = json_decode($client->getResponse()->getContent(), true)['token'];
+        $token = $this->getTokenFromResponse($client);
         $client->request('GET', '/api/auth/me', [], [], [
-            'HTTP_AUTHORIZATION' => "Bearer $token",
+            'HTTP_AUTHORIZATION' => "Bearer {$token}",
         ]);
         $this->assertResponseIsSuccessful();
-        $data = json_decode($client->getResponse()->getContent(), true);
+        /** @var array{locale: string} $data */
+        $data = $this->jsonDecode($client->getResponse()->getContent());
         $this->assertArrayHasKey('locale', $data);
         $this->assertEquals('en', $data['locale']);
     }
@@ -207,15 +229,16 @@ class AuthControllerTest extends WebTestCase
             'password' => self::VALID_PASSWORD,
             'displayName' => 'Patch User',
         ]);
-        $token = json_decode($client->getResponse()->getContent(), true)['token'];
+        $token = $this->getTokenFromResponse($client);
 
         $client->request(
             'PATCH', '/api/auth/me', [], [],
-            ['CONTENT_TYPE' => 'application/json', 'HTTP_AUTHORIZATION' => "Bearer $token"],
-            json_encode(['locale' => 'pl'])
+            ['CONTENT_TYPE' => 'application/json', 'HTTP_AUTHORIZATION' => "Bearer {$token}"],
+            (string) json_encode(['locale' => 'pl'])
         );
         $this->assertResponseIsSuccessful();
-        $data = json_decode($client->getResponse()->getContent(), true);
+        /** @var array{locale: string} $data */
+        $data = $this->jsonDecode($client->getResponse()->getContent());
         $this->assertEquals('pl', $data['locale']);
     }
 
@@ -227,12 +250,12 @@ class AuthControllerTest extends WebTestCase
             'password' => self::VALID_PASSWORD,
             'displayName' => 'Patch Bad',
         ]);
-        $token = json_decode($client->getResponse()->getContent(), true)['token'];
+        $token = $this->getTokenFromResponse($client);
 
         $client->request(
             'PATCH', '/api/auth/me', [], [],
-            ['CONTENT_TYPE' => 'application/json', 'HTTP_AUTHORIZATION' => "Bearer $token"],
-            json_encode(['locale' => 'de'])
+            ['CONTENT_TYPE' => 'application/json', 'HTTP_AUTHORIZATION' => "Bearer {$token}"],
+            (string) json_encode(['locale' => 'de'])
         );
         $this->assertResponseStatusCodeSame(400);
     }
@@ -243,7 +266,7 @@ class AuthControllerTest extends WebTestCase
         $client->request(
             'PATCH', '/api/auth/me', [], [],
             ['CONTENT_TYPE' => 'application/json'],
-            json_encode(['locale' => 'pl'])
+            (string) json_encode(['locale' => 'pl'])
         );
         $this->assertResponseStatusCodeSame(401);
     }
@@ -258,7 +281,8 @@ class AuthControllerTest extends WebTestCase
             'locale' => 'de',
         ]);
         $this->assertResponseStatusCodeSame(201);
-        $data = json_decode($client->getResponse()->getContent(), true);
+        /** @var array{user: array{locale: string}} $data */
+        $data = $this->jsonDecode($client->getResponse()->getContent());
         $this->assertEquals('en', $data['user']['locale']);
     }
 
@@ -268,10 +292,11 @@ class AuthControllerTest extends WebTestCase
         $client->request(
             'POST', '/api/auth/register', [], [],
             ['CONTENT_TYPE' => 'application/json', 'HTTP_ACCEPT_LANGUAGE' => 'pl'],
-            json_encode(['email' => 'not-an-email', 'password' => self::VALID_PASSWORD, 'displayName' => 'X'])
+            (string) json_encode(['email' => 'not-an-email', 'password' => self::VALID_PASSWORD, 'displayName' => 'X'])
         );
         $this->assertResponseStatusCodeSame(400);
-        $data = json_decode($client->getResponse()->getContent(), true);
+        /** @var array{error: string} $data */
+        $data = $this->jsonDecode($client->getResponse()->getContent());
         $this->assertEquals('Nieprawidłowy adres e-mail', $data['error']);
     }
 
@@ -284,7 +309,8 @@ class AuthControllerTest extends WebTestCase
             'displayName' => 'Theme User',
         ]);
         $this->assertResponseStatusCodeSame(201);
-        $data = json_decode($client->getResponse()->getContent(), true);
+        /** @var array{user: array{theme: string}} $data */
+        $data = $this->jsonDecode($client->getResponse()->getContent());
         $this->assertEquals('forest', $data['user']['theme']);
     }
 
@@ -301,7 +327,8 @@ class AuthControllerTest extends WebTestCase
             'password' => self::VALID_PASSWORD,
         ]);
         $this->assertResponseIsSuccessful();
-        $data = json_decode($client->getResponse()->getContent(), true);
+        /** @var array{user: array{theme: string}} $data */
+        $data = $this->jsonDecode($client->getResponse()->getContent());
         $this->assertEquals('forest', $data['user']['theme']);
     }
 
@@ -313,15 +340,16 @@ class AuthControllerTest extends WebTestCase
             'password' => self::VALID_PASSWORD,
             'displayName' => 'Theme Patch',
         ]);
-        $token = json_decode($client->getResponse()->getContent(), true)['token'];
+        $token = $this->getTokenFromResponse($client);
 
         $client->request(
             'PATCH', '/api/auth/me', [], [],
-            ['CONTENT_TYPE' => 'application/json', 'HTTP_AUTHORIZATION' => "Bearer $token"],
-            json_encode(['theme' => 'ocean'])
+            ['CONTENT_TYPE' => 'application/json', 'HTTP_AUTHORIZATION' => "Bearer {$token}"],
+            (string) json_encode(['theme' => 'ocean'])
         );
         $this->assertResponseIsSuccessful();
-        $data = json_decode($client->getResponse()->getContent(), true);
+        /** @var array{theme: string} $data */
+        $data = $this->jsonDecode($client->getResponse()->getContent());
         $this->assertEquals('ocean', $data['theme']);
     }
 
@@ -333,12 +361,12 @@ class AuthControllerTest extends WebTestCase
             'password' => self::VALID_PASSWORD,
             'displayName' => 'Theme Bad',
         ]);
-        $token = json_decode($client->getResponse()->getContent(), true)['token'];
+        $token = $this->getTokenFromResponse($client);
 
         $client->request(
             'PATCH', '/api/auth/me', [], [],
-            ['CONTENT_TYPE' => 'application/json', 'HTTP_AUTHORIZATION' => "Bearer $token"],
-            json_encode(['theme' => 'neon-rainbow'])
+            ['CONTENT_TYPE' => 'application/json', 'HTTP_AUTHORIZATION' => "Bearer {$token}"],
+            (string) json_encode(['theme' => 'neon-rainbow'])
         );
         $this->assertResponseStatusCodeSame(400);
     }
@@ -351,15 +379,16 @@ class AuthControllerTest extends WebTestCase
             'password' => self::VALID_PASSWORD,
             'displayName' => 'Currency Patch',
         ]);
-        $token = json_decode($client->getResponse()->getContent(), true)['token'];
+        $token = $this->getTokenFromResponse($client);
 
         $client->request(
             'PATCH', '/api/auth/me', [], [],
-            ['CONTENT_TYPE' => 'application/json', 'HTTP_AUTHORIZATION' => "Bearer $token"],
-            json_encode(['currency' => 'EUR'])
+            ['CONTENT_TYPE' => 'application/json', 'HTTP_AUTHORIZATION' => "Bearer {$token}"],
+            (string) json_encode(['currency' => 'EUR'])
         );
         $this->assertResponseIsSuccessful();
-        $data = json_decode($client->getResponse()->getContent(), true);
+        /** @var array{currency: string} $data */
+        $data = $this->jsonDecode($client->getResponse()->getContent());
         $this->assertEquals('EUR', $data['currency']);
     }
 
@@ -371,12 +400,12 @@ class AuthControllerTest extends WebTestCase
             'password' => self::VALID_PASSWORD,
             'displayName' => 'Currency Bad',
         ]);
-        $token = json_decode($client->getResponse()->getContent(), true)['token'];
+        $token = $this->getTokenFromResponse($client);
 
         $client->request(
             'PATCH', '/api/auth/me', [], [],
-            ['CONTENT_TYPE' => 'application/json', 'HTTP_AUTHORIZATION' => "Bearer $token"],
-            json_encode(['currency' => 'MOON'])
+            ['CONTENT_TYPE' => 'application/json', 'HTTP_AUTHORIZATION' => "Bearer {$token}"],
+            (string) json_encode(['currency' => 'MOON'])
         );
         $this->assertResponseStatusCodeSame(400);
     }
@@ -390,14 +419,15 @@ class AuthControllerTest extends WebTestCase
             'displayName' => 'Default User',
         ]);
         $this->assertResponseStatusCodeSame(201);
-        $token = json_decode($client->getResponse()->getContent(), true)['token'];
+        $token = $this->getTokenFromResponse($client);
 
         $client->request(
             'GET', '/api/categories', [], [],
-            ['HTTP_AUTHORIZATION' => "Bearer $token"]
+            ['HTTP_AUTHORIZATION' => "Bearer {$token}"]
         );
         $this->assertResponseIsSuccessful();
-        $data = json_decode($client->getResponse()->getContent(), true);
+        /** @var array{'hydra:member': array<int, array<string, mixed>>} $data */
+        $data = $this->jsonDecode($client->getResponse()->getContent());
         $members = $data['hydra:member'];
         $this->assertCount(2, $members);
 
