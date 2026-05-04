@@ -2,6 +2,7 @@
 
 namespace App\Tests\Unit\Service;
 
+use App\Entity\PlannedItem;
 use App\Entity\RecurringEvent;
 use App\Entity\User;
 use App\Repository\PlannedItemRepository;
@@ -33,11 +34,13 @@ class RecurringEventGeneratorServiceTest extends TestCase
 
     public function testNextDateDays(): void
     {
+        /** @var PlannedItem[] $persisted */
         $persisted = [];
         $repo = $this->createStub(PlannedItemRepository::class);
         $repo->method('existsForEventOnDate')->willReturn(false);
         $em = $this->createStub(EntityManagerInterface::class);
         $em->method('persist')->willReturnCallback(function (object $item) use (&$persisted): void {
+            assert($item instanceof PlannedItem);
             $persisted[] = $item;
         });
         $service = new RecurringEventGeneratorService($repo, $em);
@@ -55,11 +58,13 @@ class RecurringEventGeneratorServiceTest extends TestCase
 
     public function testNextDateWeeks(): void
     {
+        /** @var PlannedItem[] $persisted */
         $persisted = [];
         $repo = $this->createStub(PlannedItemRepository::class);
         $repo->method('existsForEventOnDate')->willReturn(false);
         $em = $this->createStub(EntityManagerInterface::class);
         $em->method('persist')->willReturnCallback(function (object $item) use (&$persisted): void {
+            assert($item instanceof PlannedItem);
             $persisted[] = $item;
         });
         $service = new RecurringEventGeneratorService($repo, $em);
@@ -77,11 +82,13 @@ class RecurringEventGeneratorServiceTest extends TestCase
 
     public function testNextDateMonths(): void
     {
+        /** @var PlannedItem[] $persisted */
         $persisted = [];
         $repo = $this->createStub(PlannedItemRepository::class);
         $repo->method('existsForEventOnDate')->willReturn(false);
         $em = $this->createStub(EntityManagerInterface::class);
         $em->method('persist')->willReturnCallback(function (object $item) use (&$persisted): void {
+            assert($item instanceof PlannedItem);
             $persisted[] = $item;
         });
         $service = new RecurringEventGeneratorService($repo, $em);
@@ -96,11 +103,13 @@ class RecurringEventGeneratorServiceTest extends TestCase
 
     public function testNextDateYears(): void
     {
+        /** @var PlannedItem[] $persisted */
         $persisted = [];
         $repo = $this->createStub(PlannedItemRepository::class);
         $repo->method('existsForEventOnDate')->willReturn(false);
         $em = $this->createStub(EntityManagerInterface::class);
         $em->method('persist')->willReturnCallback(function (object $item) use (&$persisted): void {
+            assert($item instanceof PlannedItem);
             $persisted[] = $item;
         });
         $service = new RecurringEventGeneratorService($repo, $em);
@@ -115,11 +124,13 @@ class RecurringEventGeneratorServiceTest extends TestCase
 
     public function testPinToDayEndOfMonth(): void
     {
+        /** @var PlannedItem[] $persisted */
         $persisted = [];
         $repo = $this->createStub(PlannedItemRepository::class);
         $repo->method('existsForEventOnDate')->willReturn(false);
         $em = $this->createStub(EntityManagerInterface::class);
         $em->method('persist')->willReturnCallback(function (object $item) use (&$persisted): void {
+            assert($item instanceof PlannedItem);
             $persisted[] = $item;
         });
         $service = new RecurringEventGeneratorService($repo, $em);
@@ -137,11 +148,13 @@ class RecurringEventGeneratorServiceTest extends TestCase
 
     public function testPinToDayLeapYear(): void
     {
+        /** @var PlannedItem[] $persisted */
         $persisted = [];
         $repo = $this->createStub(PlannedItemRepository::class);
         $repo->method('existsForEventOnDate')->willReturn(false);
         $em = $this->createStub(EntityManagerInterface::class);
         $em->method('persist')->willReturnCallback(function (object $item) use (&$persisted): void {
+            assert($item instanceof PlannedItem);
             $persisted[] = $item;
         });
         $service = new RecurringEventGeneratorService($repo, $em);

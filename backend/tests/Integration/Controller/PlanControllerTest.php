@@ -168,7 +168,7 @@ class PlanControllerTest extends WebTestCase
         );
 
         $this->assertResponseIsSuccessful();
-        /** @var array{generated: int} $data */
+        /** @var array{generated: mixed} $data */
         $data = json_decode((string) $client->getResponse()->getContent(), true);
         $this->assertArrayHasKey('generated', $data);
         $this->assertIsInt($data['generated']);
