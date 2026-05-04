@@ -85,7 +85,7 @@ class RecurringEventGeneratorService
         $limit = 500;
         $count = 0;
 
-        while ($current <= $until && $count < $limit) {
+        while ($current->format('Y-m-d') <= $until->format('Y-m-d') && $count < $limit) {
             $dates[] = $current;
             $current = $this->nextDate($event, $current);
             $count++;
@@ -105,17 +105,18 @@ class RecurringEventGeneratorService
             case 'weeks':
                 return $from->modify("+{$n} weeks");
             case 'months':
-                $next = $from->modify("+{$n} months");
                 if ($event->getDayOfMonth() !== null) {
-                    $next = $this->pinToDay($next, $event->getDayOfMonth());
+                    // Navigate via 1st of month to avoid PHP overflow (e.g. Jan 31 + 1 month = Mar 3)
+                    $firstOfMonth = $from->setDate((int) $from->format('Y'), (int) $from->format('n'), 1);
+                    return $this->pinToDay($firstOfMonth->modify("+{$n} months"), $event->getDayOfMonth());
                 }
-                return $next;
+                return $from->modify("+{$n} months");
             case 'years':
-                $next = $from->modify("+{$n} years");
                 if ($event->getDayOfMonth() !== null) {
-                    $next = $this->pinToDay($next, $event->getDayOfMonth());
+                    $firstOfMonth = $from->setDate((int) $from->format('Y'), (int) $from->format('n'), 1);
+                    return $this->pinToDay($firstOfMonth->modify("+{$n} years"), $event->getDayOfMonth());
                 }
-                return $next;
+                return $from->modify("+{$n} years");
             default:
                 return $from->modify("+{$n} months");
         }

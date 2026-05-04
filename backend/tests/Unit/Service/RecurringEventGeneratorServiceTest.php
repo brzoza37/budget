@@ -135,7 +135,7 @@ class RecurringEventGeneratorServiceTest extends TestCase
         });
         $service = new RecurringEventGeneratorService($repo, $em);
 
-        $service->generate($this->makeEvent('2026-01-31', 'months', 1, 31), new \DateTimeImmutable('2026-02-28 23:59:59'));
+        $service->generate($this->makeEvent('2026-01-31', 'months', 1, 31), new \DateTimeImmutable('2026-02-28'));
 
         $this->assertCount(2, $persisted);
         $dueDate0 = $persisted[0]->getDueDate();
@@ -159,7 +159,7 @@ class RecurringEventGeneratorServiceTest extends TestCase
         });
         $service = new RecurringEventGeneratorService($repo, $em);
 
-        $service->generate($this->makeEvent('2024-01-31', 'months', 1, 31), new \DateTimeImmutable('2024-02-29 23:59:59'));
+        $service->generate($this->makeEvent('2024-01-31', 'months', 1, 31), new \DateTimeImmutable('2024-02-29'));
 
         $this->assertCount(2, $persisted);
         $dueDate1 = $persisted[1]->getDueDate();
