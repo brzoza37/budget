@@ -40,15 +40,15 @@ class RecurringEvent
 
     #[ORM\Column(length: 255)]
     #[Groups(['recurring:read', 'recurring:write', 'plan:read'])]
-    private ?string $name = null;
+    private string $name = '';
 
     #[ORM\Column]
     #[Groups(['recurring:read', 'recurring:write'])]
-    private ?float $amount = null;
+    private float $amount = 0.0;
 
     #[ORM\Column(length: 10)]
     #[Groups(['recurring:read', 'recurring:write'])]
-    private ?string $type = null; // INCOME or EXPENSE
+    private string $type = ''; // INCOME or EXPENSE
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: true)]
@@ -62,11 +62,11 @@ class RecurringEvent
 
     #[ORM\Column]
     #[Groups(['recurring:read', 'recurring:write'])]
-    private ?int $repeatEvery = 1;
+    private int $repeatEvery = 1;
 
     #[ORM\Column(length: 10)]
     #[Groups(['recurring:read', 'recurring:write'])]
-    private ?string $repeatUnit = 'months'; // days, weeks, months, years
+    private string $repeatUnit = 'months'; // days, weeks, months, years
 
     #[ORM\Column(nullable: true)]
     #[Groups(['recurring:read', 'recurring:write'])]
@@ -74,6 +74,7 @@ class RecurringEvent
 
     #[ORM\Column]
     #[Groups(['recurring:read', 'recurring:write'])]
+    // @phpstan-ignore doctrine.columnType (set via explicit setter before persist)
     private ?\DateTimeImmutable $startDate = null;
 
     #[ORM\Column(type: 'text', nullable: true)]
@@ -82,14 +83,17 @@ class RecurringEvent
 
     #[ORM\Column]
     #[Groups(['recurring:read'])]
+    // @phpstan-ignore doctrine.columnType (set by lifecycle callback before persist)
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column]
     #[Groups(['recurring:read'])]
+    // @phpstan-ignore doctrine.columnType (set by lifecycle callback before persist)
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    // @phpstan-ignore doctrine.associationType (always set before persist via SetUserListener or explicit setter)
     private ?User $user = null;
 
     public function getUser(): ?User { return $this->user; }
@@ -103,13 +107,13 @@ class RecurringEvent
 
     public function getId(): ?int { return $this->id; }
 
-    public function getName(): ?string { return $this->name; }
+    public function getName(): string { return $this->name; }
     public function setName(string $name): static { $this->name = $name; return $this; }
 
-    public function getAmount(): ?float { return $this->amount; }
+    public function getAmount(): float { return $this->amount; }
     public function setAmount(float $amount): static { $this->amount = $amount; return $this; }
 
-    public function getType(): ?string { return $this->type; }
+    public function getType(): string { return $this->type; }
     public function setType(string $type): static { $this->type = $type; return $this; }
 
     public function getCategory(): ?Category { return $this->category; }
@@ -118,10 +122,10 @@ class RecurringEvent
     public function getAccount(): ?Account { return $this->account; }
     public function setAccount(?Account $account): static { $this->account = $account; return $this; }
 
-    public function getRepeatEvery(): ?int { return $this->repeatEvery; }
+    public function getRepeatEvery(): int { return $this->repeatEvery; }
     public function setRepeatEvery(int $repeatEvery): static { $this->repeatEvery = $repeatEvery; return $this; }
 
-    public function getRepeatUnit(): ?string { return $this->repeatUnit; }
+    public function getRepeatUnit(): string { return $this->repeatUnit; }
     public function setRepeatUnit(string $repeatUnit): static { $this->repeatUnit = $repeatUnit; return $this; }
 
     public function getDayOfMonth(): ?int { return $this->dayOfMonth; }

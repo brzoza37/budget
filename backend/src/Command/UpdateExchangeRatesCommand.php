@@ -33,7 +33,9 @@ class UpdateExchangeRatesCommand extends Command
             return Command::SUCCESS;
         }
 
-        $rates = $data['rates'] ?? [];
+        /** @var array<string, float> $rates */
+        $rates = isset($data['rates']) && is_array($data['rates']) ? $data['rates'] : [];
+        /** @var \App\Repository\ExchangeRateRepository $repo */
         $repo  = $this->em->getRepository(ExchangeRate::class);
 
         foreach ($rates as $currency => $rate) {

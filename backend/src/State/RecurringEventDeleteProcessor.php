@@ -8,8 +8,12 @@ use App\Entity\RecurringEvent;
 use App\Repository\PlannedItemRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
+/** @implements ProcessorInterface<mixed, void> */
 final class RecurringEventDeleteProcessor implements ProcessorInterface
 {
+    /**
+     * @param ProcessorInterface<mixed, void> $innerProcessor
+     */
     public function __construct(
         private readonly ProcessorInterface $innerProcessor,
         private readonly PlannedItemRepository $plannedItemRepository,

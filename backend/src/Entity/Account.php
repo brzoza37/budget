@@ -32,42 +32,45 @@ class Account
 
     #[ORM\Column(length: 255)]
     #[Groups(['account:read', 'account:write', 'transaction:read', 'planned:read', 'plan:read'])]
-    private ?string $name = null;
+    private string $name = '';
 
     #[ORM\Column(length: 50)]
     #[Groups(['account:read', 'account:write'])]
-    private ?string $type = null;
+    private string $type = '';
 
     #[ORM\Column]
     #[Groups(['account:read', 'account:write', 'transaction:read', 'planned:read', 'plan:read'])]
-    private ?float $balance = 0.0;
+    private float $balance = 0.0;
 
     #[ORM\Column(length: 10)]
     #[Groups(['account:read', 'account:write', 'transaction:read', 'planned:read', 'plan:read'])]
-    private ?string $currency = 'USD';
+    private string $currency = 'USD';
 
     #[ORM\Column(length: 20)]
     #[Groups(['account:read', 'account:write', 'transaction:read', 'planned:read', 'plan:read'])]
-    private ?string $color = '#4CAF50';
+    private string $color = '#4CAF50';
 
     #[ORM\Column(length: 50)]
     #[Groups(['account:read', 'account:write', 'transaction:read', 'planned:read', 'plan:read'])]
-    private ?string $icon = 'account_balance_wallet';
+    private string $icon = 'account_balance_wallet';
 
     #[ORM\Column]
     #[Groups(['account:read', 'account:write'])]
-    private ?bool $isArchived = false;
+    private bool $isArchived = false;
 
     #[ORM\Column]
     #[Groups(['account:read'])]
+    // @phpstan-ignore doctrine.columnType (set by lifecycle callback before persist)
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column]
     #[Groups(['account:read'])]
+    // @phpstan-ignore doctrine.columnType (set by lifecycle callback before persist)
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    // @phpstan-ignore doctrine.associationType (always set before persist via SetUserListener or explicit setter)
     private ?User $user = null;
 
     public function getUser(): ?User { return $this->user; }
@@ -84,7 +87,7 @@ class Account
         return $this->id;
     }
 
-    public function getName(): ?string
+    public function getName(): string
     {
         return $this->name;
     }
@@ -95,7 +98,7 @@ class Account
         return $this;
     }
 
-    public function getType(): ?string
+    public function getType(): string
     {
         return $this->type;
     }
@@ -106,7 +109,7 @@ class Account
         return $this;
     }
 
-    public function getBalance(): ?float
+    public function getBalance(): float
     {
         return $this->balance;
     }
@@ -117,7 +120,7 @@ class Account
         return $this;
     }
 
-    public function getCurrency(): ?string
+    public function getCurrency(): string
     {
         return $this->currency;
     }
@@ -128,7 +131,7 @@ class Account
         return $this;
     }
 
-    public function getColor(): ?string
+    public function getColor(): string
     {
         return $this->color;
     }
@@ -139,7 +142,7 @@ class Account
         return $this;
     }
 
-    public function getIcon(): ?string
+    public function getIcon(): string
     {
         return $this->icon;
     }
@@ -150,7 +153,7 @@ class Account
         return $this;
     }
 
-    public function isArchived(): ?bool
+    public function isArchived(): bool
     {
         return $this->isArchived;
     }

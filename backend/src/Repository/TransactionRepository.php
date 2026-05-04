@@ -24,6 +24,7 @@ class TransactionRepository extends ServiceEntityRepository
         $start = new \DateTimeImmutable(sprintf('%d-%02d-01', $year, $month));
         $end   = $start->modify('first day of next month');
 
+        /** @var array<int, array{amount: string|float, currency: string}> $rows */
         $rows = $this->createQueryBuilder('t')
             ->select('t.amount', 'a.currency')
             ->join('t.account', 'a')
@@ -43,7 +44,7 @@ class TransactionRepository extends ServiceEntityRepository
         foreach ($rows as $row) {
             $converted = $this->exchangeRateRepository->convert(
                 (float) $row['amount'],
-                $row['currency'],
+                (string) $row['currency'],
                 $userCurrency
             );
             $total += $converted ?? (float) $row['amount'];
@@ -56,6 +57,7 @@ class TransactionRepository extends ServiceEntityRepository
         $start = new \DateTimeImmutable(sprintf('%d-%02d-01', $year, $month));
         $end   = $start->modify('first day of next month');
 
+        /** @var array{spent: string|float} $result */
         $result = $this->createQueryBuilder('t')
             ->select('COALESCE(SUM(t.amount), 0) as spent')
             ->where('t.type = :type')

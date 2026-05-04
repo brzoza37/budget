@@ -34,26 +34,29 @@ class Budget
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['budget:read', 'budget:write'])]
+    // @phpstan-ignore doctrine.associationType (always set before persist via SetUserListener or explicit setter)
     private ?Category $category = null;
 
     #[ORM\Column]
     #[Groups(['budget:read', 'budget:write'])]
-    private ?float $amount = null;
+    private float $amount = 0.0;
 
     #[ORM\Column]
     #[Groups(['budget:read', 'budget:write'])]
-    private ?int $month = null;
+    private int $month = 0;
 
     #[ORM\Column]
     #[Groups(['budget:read', 'budget:write'])]
-    private ?int $year = null;
+    private int $year = 0;
 
     #[ORM\Column]
     #[Groups(['budget:read'])]
+    // @phpstan-ignore doctrine.columnType (set by lifecycle callback before persist)
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column]
     #[Groups(['budget:read'])]
+    // @phpstan-ignore doctrine.columnType (set by lifecycle callback before persist)
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[Groups(['budget:read'])]
@@ -61,6 +64,7 @@ class Budget
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    // @phpstan-ignore doctrine.associationType (always set before persist via SetUserListener or explicit setter)
     private ?User $user = null;
 
     public function getUser(): ?User { return $this->user; }
@@ -88,7 +92,7 @@ class Budget
         return $this;
     }
 
-    public function getAmount(): ?float
+    public function getAmount(): float
     {
         return $this->amount;
     }
@@ -99,7 +103,7 @@ class Budget
         return $this;
     }
 
-    public function getMonth(): ?int
+    public function getMonth(): int
     {
         return $this->month;
     }
@@ -110,7 +114,7 @@ class Budget
         return $this;
     }
 
-    public function getYear(): ?int
+    public function getYear(): int
     {
         return $this->year;
     }

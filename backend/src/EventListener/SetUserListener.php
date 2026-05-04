@@ -13,6 +13,7 @@ class SetUserListener
 {
     public function __construct(private readonly Security $security) {}
 
+    /** @param \Doctrine\Persistence\Event\LifecycleEventArgs<\Doctrine\ORM\EntityManagerInterface> $args */
     public function prePersist(LifecycleEventArgs $args): void
     {
         $entity = $args->getObject();

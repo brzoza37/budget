@@ -74,8 +74,12 @@ class RecurringEventGeneratorService
     /** @return \DateTimeImmutable[] */
     private function computeDates(RecurringEvent $event, \DateTimeImmutable $until): array
     {
-        $dates = [];
         $current = $event->getStartDate();
+        if ($current === null) {
+            return [];
+        }
+
+        $dates = [];
 
         // Safety cap: never generate more than 500 instances per call
         $limit = 500;
