@@ -11,9 +11,9 @@ use Doctrine\Persistence\ManagerRegistry;
  * @extends ServiceEntityRepository<Account>
  *
  * @method Account|null find($id, $lockMode = null, $lockVersion = null)
- * @method Account|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Account|null findOneBy(array<string, mixed> $criteria, array<string, string>|null $orderBy = null)
  * @method Account[]    findAll()
- * @method Account[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Account[]    findBy(array<string, mixed> $criteria, array<string, string>|null $orderBy = null, $limit = null, $offset = null)
  */
 class AccountRepository extends ServiceEntityRepository
 {
@@ -29,6 +29,7 @@ class AccountRepository extends ServiceEntityRepository
      */
     public function getTotalBalance(User $user): array
     {
+        /** @var array<int, array{balance: string|float, currency: string}> $rows */
         $rows = $this->createQueryBuilder('a')
             ->select('a.balance', 'a.currency')
             ->where('a.isArchived = false')
@@ -39,16 +40,17 @@ class AccountRepository extends ServiceEntityRepository
 
         $userCurrency = $user->getCurrency();
         $total = 0.0;
+        /** @var string[] $missingCurrencies */
         $missingCurrencies = [];
 
         foreach ($rows as $row) {
             $converted = $this->exchangeRateRepository->convert(
                 (float) $row['balance'],
-                $row['currency'],
+                (string) $row['currency'],
                 $userCurrency
             );
             if ($converted === null) {
-                $missingCurrencies[] = $row['currency'];
+                $missingCurrencies[] = (string) $row['currency'];
             } else {
                 $total += $converted;
             }

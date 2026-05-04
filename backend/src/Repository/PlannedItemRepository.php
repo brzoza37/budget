@@ -23,6 +23,7 @@ class PlannedItemRepository extends ServiceEntityRepository
         $start = new \DateTimeImmutable(sprintf('%d-%02d-01', $year, $month));
         $end = $start->modify('first day of next month');
 
+        /** @var array{total: string|float} $result */
         $result = $this->createQueryBuilder('p')
             ->select('COALESCE(SUM(p.amount), 0) as total')
             ->where('p.type = :type')
@@ -45,6 +46,7 @@ class PlannedItemRepository extends ServiceEntityRepository
         $start = new \DateTimeImmutable(sprintf('%d-%02d-01', $year, $month));
         $end = $start->modify('first day of next month');
 
+        /** @var array{total: string|float} $result */
         $result = $this->createQueryBuilder('p')
             ->select('COALESCE(SUM(p.amount), 0) as total')
             ->where('p.type = :type')
@@ -65,12 +67,15 @@ class PlannedItemRepository extends ServiceEntityRepository
     /** @return PlannedItem[] */
     public function findUnpaidByRecurringEvent(RecurringEvent $event): array
     {
-        return $this->createQueryBuilder('p')
+        /** @var PlannedItem[] $results */
+        $results = $this->createQueryBuilder('p')
             ->where('p.recurringEvent = :event')
             ->andWhere('p.isPaid = false')
             ->setParameter('event', $event)
             ->getQuery()
             ->getResult();
+
+        return $results;
     }
 
     public function existsForEventOnDate(RecurringEvent $event, \DateTimeImmutable $date): bool

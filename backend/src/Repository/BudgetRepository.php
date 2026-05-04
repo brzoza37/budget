@@ -10,9 +10,9 @@ use Doctrine\Persistence\ManagerRegistry;
  * @extends ServiceEntityRepository<Budget>
  *
  * @method Budget|null find($id, $lockMode = null, $lockVersion = null)
- * @method Budget|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Budget|null findOneBy(array<string, mixed> $criteria, array<string, string>|null $orderBy = null)
  * @method Budget[]    findAll()
- * @method Budget[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Budget[]    findBy(array<string, mixed> $criteria, array<string, string>|null $orderBy = null, $limit = null, $offset = null)
  */
 class BudgetRepository extends ServiceEntityRepository
 {

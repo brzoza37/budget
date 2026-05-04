@@ -29,11 +29,16 @@ class AuthController extends AbstractController
         EntityManagerInterface $em,
         JWTTokenManagerInterface $jwtManager,
     ): JsonResponse {
+        /** @var array<string, mixed> $data */
         $data = json_decode($request->getContent(), true) ?? [];
-        $email = strtolower(trim((string) ($data['email'] ?? '')));
-        $password = (string) ($data['password'] ?? '');
-        $displayName = trim((string) ($data['displayName'] ?? ''));
-        $locale = (string) ($data['locale'] ?? 'en');
+        $emailRaw = $data['email'] ?? '';
+        $passwordRaw = $data['password'] ?? '';
+        $displayNameRaw = $data['displayName'] ?? '';
+        $localeRaw = $data['locale'] ?? 'en';
+        $email = strtolower(trim(is_string($emailRaw) ? $emailRaw : ''));
+        $password = is_string($passwordRaw) ? $passwordRaw : '';
+        $displayName = trim(is_string($displayNameRaw) ? $displayNameRaw : '');
+        $locale = is_string($localeRaw) ? $localeRaw : 'en';
 
         if ($email === '' || $password === '' || $displayName === '') {
             return $this->json(['error' => $this->translator->trans('error.auth.email_required')], Response::HTTP_BAD_REQUEST);
@@ -108,10 +113,11 @@ class AuthController extends AbstractController
             throw $this->createAccessDeniedException();
         }
 
+        /** @var array<string, mixed> $data */
         $data = json_decode($request->getContent(), true) ?? [];
 
         if (array_key_exists('locale', $data)) {
-            $locale = (string) $data['locale'];
+            $locale = is_string($data['locale']) ? $data['locale'] : '';
             if (!in_array($locale, self::SUPPORTED_LOCALES, true)) {
                 return $this->json(['error' => $this->translator->trans('error.auth.invalid_locale')], Response::HTTP_BAD_REQUEST);
             }
@@ -119,7 +125,7 @@ class AuthController extends AbstractController
         }
 
         if (array_key_exists('theme', $data)) {
-            $theme = (string) $data['theme'];
+            $theme = is_string($data['theme']) ? $data['theme'] : '';
             if (!in_array($theme, self::SUPPORTED_THEMES, true)) {
                 return $this->json(['error' => $this->translator->trans('error.auth.invalid_theme', ['%themes%' => implode(', ', self::SUPPORTED_THEMES)])], Response::HTTP_BAD_REQUEST);
             }
@@ -127,7 +133,7 @@ class AuthController extends AbstractController
         }
 
         if (array_key_exists('currency', $data)) {
-            $currency = (string) $data['currency'];
+            $currency = is_string($data['currency']) ? $data['currency'] : '';
             if (!in_array($currency, self::SUPPORTED_CURRENCIES, true)) {
                 return $this->json(['error' => $this->translator->trans('error.auth.invalid_currency', ['%currencies%' => implode(', ', self::SUPPORTED_CURRENCIES)])], Response::HTTP_BAD_REQUEST);
             }
@@ -139,6 +145,7 @@ class AuthController extends AbstractController
         return $this->json($this->userPayload($user));
     }
 
+    /** @return array<string, mixed> */
     private function userPayload(User $user): array
     {
         return [

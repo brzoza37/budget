@@ -18,13 +18,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
-    private ?string $email = null;
+    private string $email = '';
 
     #[ORM\Column]
     private string $password = '';
 
     #[ORM\Column(length: 255)]
-    private ?string $displayName = null;
+    private string $displayName = '';
 
     #[ORM\Column(length: 3)]
     private string $currency = 'USD';
@@ -35,10 +35,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 30)]
     private string $theme = 'forest';
 
+    /** @var string[] */
     #[ORM\Column(type: 'json')]
     private array $roles = [];
 
     #[ORM\Column]
+    // @phpstan-ignore doctrine.columnType (set by lifecycle callback before persist)
     private ?\DateTimeImmutable $createdAt = null;
 
     public function __construct()
@@ -48,23 +50,32 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getId(): ?int { return $this->id; }
 
-    public function getEmail(): ?string { return $this->email; }
+    public function getEmail(): string { return $this->email; }
     public function setEmail(string $email): static { $this->email = $email; return $this; }
 
-    public function getUserIdentifier(): string { return (string) $this->email; }
+    public function getUserIdentifier(): string
+    {
+        if ($this->email === '') {
+            throw new \LogicException('User email is not set.');
+        }
+        return $this->email;
+    }
 
+    /** @return string[] */
     public function getRoles(): array
     {
         $roles = $this->roles;
         $roles[] = 'ROLE_USER';
         return array_unique($roles);
     }
+
+    /** @param string[] $roles */
     public function setRoles(array $roles): static { $this->roles = $roles; return $this; }
 
     public function getPassword(): string { return $this->password; }
     public function setPassword(string $password): static { $this->password = $password; return $this; }
 
-    public function getDisplayName(): ?string { return $this->displayName; }
+    public function getDisplayName(): string { return $this->displayName; }
     public function setDisplayName(string $displayName): static { $this->displayName = $displayName; return $this; }
 
     public function getCurrency(): string { return $this->currency; }

@@ -36,19 +36,19 @@ class Category
 
     #[ORM\Column(length: 255)]
     #[Groups(['category:read', 'category:write', 'transaction:read', 'budget:read', 'planned:read', 'plan:read'])]
-    private ?string $name = null;
+    private string $name = '';
 
     #[ORM\Column(length: 50)]
     #[Groups(['category:read', 'category:write', 'transaction:read', 'budget:read', 'planned:read', 'plan:read'])]
-    private ?string $type = null; // INCOME or EXPENSE
+    private string $type = ''; // INCOME or EXPENSE
 
     #[ORM\Column(length: 20)]
     #[Groups(['category:read', 'category:write', 'transaction:read', 'budget:read', 'planned:read', 'plan:read'])]
-    private ?string $color = '#FF5722';
+    private string $color = '#FF5722';
 
     #[ORM\Column(length: 50)]
     #[Groups(['category:read', 'category:write', 'transaction:read', 'budget:read', 'planned:read', 'plan:read'])]
-    private ?string $icon = 'category';
+    private string $icon = 'category';
 
     #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'subCategories')]
     #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
@@ -56,6 +56,7 @@ class Category
     #[MaxDepth(1)]
     private ?self $parent = null;
 
+    /** @var Collection<int, Category> */
     #[ORM\OneToMany(mappedBy: 'parent', targetEntity: self::class)]
     #[Groups(['category:read'])]
     #[MaxDepth(1)]
@@ -63,18 +64,21 @@ class Category
 
     #[ORM\Column]
     #[Groups(['category:read', 'category:write'])]
-    private ?bool $isArchived = false;
+    private bool $isArchived = false;
 
     #[ORM\Column]
     #[Groups(['category:read'])]
+    // @phpstan-ignore doctrine.columnType (set by lifecycle callback before persist)
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column]
     #[Groups(['category:read'])]
+    // @phpstan-ignore doctrine.columnType (set by lifecycle callback before persist)
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    // @phpstan-ignore doctrine.associationType (always set before persist via SetUserListener or explicit setter)
     private ?User $user = null;
 
     public function getUser(): ?User { return $this->user; }
@@ -92,7 +96,7 @@ class Category
         return $this->id;
     }
 
-    public function getName(): ?string
+    public function getName(): string
     {
         return $this->name;
     }
@@ -103,7 +107,7 @@ class Category
         return $this;
     }
 
-    public function getType(): ?string
+    public function getType(): string
     {
         return $this->type;
     }
@@ -114,7 +118,7 @@ class Category
         return $this;
     }
 
-    public function getColor(): ?string
+    public function getColor(): string
     {
         return $this->color;
     }
@@ -125,7 +129,7 @@ class Category
         return $this;
     }
 
-    public function getIcon(): ?string
+    public function getIcon(): string
     {
         return $this->icon;
     }
@@ -174,7 +178,7 @@ class Category
         return $this;
     }
 
-    public function isArchived(): ?bool
+    public function isArchived(): bool
     {
         return $this->isArchived;
     }

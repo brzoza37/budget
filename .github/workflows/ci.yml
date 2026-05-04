@@ -1,0 +1,94 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [master]
+
+jobs:
+  static-analysis:
+    name: PHPStan
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: intl, pdo_pgsql
+          coverage: none
+
+      - uses: actions/cache@v4
+        with:
+          path: backend/vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('backend/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Warm up dev cache (generates container XML for phpstan-symfony)
+        run: php bin/console cache:warmup --env=dev
+        env:
+          APP_ENV: dev
+          APP_SECRET: ci-placeholder
+          DATABASE_URL: postgresql://user:password@localhost:5432/budget?serverVersion=16&charset=utf8
+          JWT_SECRET_KEY: '%kernel.project_dir%/config/jwt/private.pem'
+          JWT_PUBLIC_KEY: '%kernel.project_dir%/config/jwt/public.pem'
+          JWT_PASSPHRASE: ci
+
+      - name: Run PHPStan
+        run: vendor/bin/phpstan analyse --no-progress
+
+  tests:
+    name: PHPUnit
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: user
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: budget_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: intl, pdo_pgsql
+          coverage: none
+
+      - uses: actions/cache@v4
+        with:
+          path: backend/vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('backend/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Generate JWT keypair
+        run: php bin/console lexik:jwt:generate-keypair --skip-if-exists
+        env:
+          APP_ENV: test
+          APP_SECRET: ci-placeholder
+          JWT_PASSPHRASE: ${{ secrets.JWT_PASSPHRASE }}
+
+      - name: Run PHPUnit
+        run: vendor/bin/phpunit --configuration phpunit.ci.xml
+        env:
+          APP_SECRET: ci-placeholder
+          JWT_PASSPHRASE: ${{ secrets.JWT_PASSPHRASE }}

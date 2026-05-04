@@ -25,6 +25,7 @@ final class CurrentUserExtension implements QueryCollectionExtensionInterface, Q
 
     private function addUserWhere(QueryBuilder $queryBuilder, string $resourceClass): void
     {
+        /** @var class-string<object> $resourceClass */
         $metadata = $queryBuilder->getEntityManager()->getClassMetadata($resourceClass);
         if (!$metadata->hasAssociation('user')) {
             return;

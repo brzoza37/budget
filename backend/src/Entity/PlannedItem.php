@@ -44,15 +44,15 @@ class PlannedItem
 
     #[ORM\Column(length: 255)]
     #[Groups(['plan:read', 'plan:write'])]
-    private ?string $name = null;
+    private string $name = '';
 
     #[ORM\Column]
     #[Groups(['plan:read', 'plan:write'])]
-    private ?float $amount = null;
+    private float $amount = 0.0;
 
     #[ORM\Column(length: 10)]
     #[Groups(['plan:read', 'plan:write'])]
-    private ?string $type = null; // INCOME or EXPENSE
+    private string $type = ''; // INCOME or EXPENSE
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: true)]
@@ -66,6 +66,7 @@ class PlannedItem
 
     #[ORM\Column]
     #[Groups(['plan:read', 'plan:write'])]
+    // @phpstan-ignore doctrine.columnType (set via explicit setter before persist)
     private ?\DateTimeImmutable $dueDate = null;
 
     #[ORM\Column]
@@ -96,14 +97,17 @@ class PlannedItem
 
     #[ORM\Column]
     #[Groups(['plan:read'])]
+    // @phpstan-ignore doctrine.columnType (set by lifecycle callback before persist)
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column]
     #[Groups(['plan:read'])]
+    // @phpstan-ignore doctrine.columnType (set by lifecycle callback before persist)
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    // @phpstan-ignore doctrine.associationType (always set before persist via SetUserListener or explicit setter)
     private ?User $user = null;
 
     public function getUser(): ?User { return $this->user; }
@@ -117,13 +121,13 @@ class PlannedItem
 
     public function getId(): ?int { return $this->id; }
 
-    public function getName(): ?string { return $this->name; }
+    public function getName(): string { return $this->name; }
     public function setName(string $name): static { $this->name = $name; return $this; }
 
-    public function getAmount(): ?float { return $this->amount; }
+    public function getAmount(): float { return $this->amount; }
     public function setAmount(float $amount): static { $this->amount = $amount; return $this; }
 
-    public function getType(): ?string { return $this->type; }
+    public function getType(): string { return $this->type; }
     public function setType(string $type): static { $this->type = $type; return $this; }
 
     public function getCategory(): ?Category { return $this->category; }

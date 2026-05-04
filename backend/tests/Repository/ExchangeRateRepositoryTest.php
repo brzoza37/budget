@@ -16,7 +16,9 @@ class ExchangeRateRepositoryTest extends KernelTestCase
     {
         $kernel = self::bootKernel();
         $this->em = $kernel->getContainer()->get('doctrine.orm.entity_manager');
-        $this->repo = $this->em->getRepository(ExchangeRate::class);
+        /** @var ExchangeRateRepository $repo */
+        $repo = $this->em->getRepository(ExchangeRate::class);
+        $this->repo = $repo;
         $this->em->getConnection()->executeStatement('DELETE FROM exchange_rate');
 
         foreach ([['USD', 1.08], ['PLN', 4.25], ['GBP', 0.86]] as [$cur, $rate]) {

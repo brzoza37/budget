@@ -36,11 +36,15 @@ class PlanController extends AbstractController
             return $this->json(['error' => 'PlannedItem not found'], Response::HTTP_NOT_FOUND);
         }
 
-        $data = json_decode($request->getContent(), true);
-        $amount = (float) ($data['amount'] ?? $item->getAmount());
-        $accountId = (int) ($data['accountId'] ?? 0);
-        $date = isset($data['date'])
-            ? new \DateTimeImmutable($data['date'])
+        /** @var array<string, mixed> $data */
+        $data = json_decode($request->getContent(), true) ?? [];
+        $amountRaw = $data['amount'] ?? null;
+        $amount = is_numeric($amountRaw) ? (float) $amountRaw : $item->getAmount();
+        $accountIdRaw = $data['accountId'] ?? null;
+        $accountId = is_int($accountIdRaw) ? $accountIdRaw : 0;
+        $dateRaw = $data['date'] ?? null;
+        $date = is_string($dateRaw)
+            ? new \DateTimeImmutable($dateRaw)
             : new \DateTimeImmutable();
 
         $account = $this->accountRepository->find($accountId);
@@ -89,9 +93,12 @@ class PlanController extends AbstractController
     #[Route('/api/plan/generate_month', name: 'plan_generate_month', methods: ['POST'])]
     public function generateMonth(Request $request): JsonResponse
     {
-        $data = json_decode($request->getContent(), true);
-        $month = (int) ($data['month'] ?? date('n'));
-        $year = (int) ($data['year'] ?? date('Y'));
+        /** @var array<string, mixed> $data */
+        $data = json_decode($request->getContent(), true) ?? [];
+        $monthRaw = $data['month'] ?? null;
+        $yearRaw = $data['year'] ?? null;
+        $month = is_int($monthRaw) ? $monthRaw : (int) date('n');
+        $year = is_int($yearRaw) ? $yearRaw : (int) date('Y');
 
         if ($month < 1 || $month > 12) {
             return $this->json(['error' => 'Invalid month'], Response::HTTP_BAD_REQUEST);

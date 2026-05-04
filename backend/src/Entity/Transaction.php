@@ -40,15 +40,16 @@ class Transaction
 
     #[ORM\Column(length: 50)]
     #[Groups(['transaction:read', 'transaction:write'])]
-    private ?string $type = null; // INCOME, EXPENSE, TRANSFER
+    private string $type = ''; // INCOME, EXPENSE, TRANSFER
 
     #[ORM\Column]
     #[Groups(['transaction:read', 'transaction:write'])]
-    private ?float $amount = null;
+    private float $amount = 0.0;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['transaction:read', 'transaction:write', 'account:read'])]
+    // @phpstan-ignore doctrine.associationType (always set before persist via SetUserListener or explicit setter)
     private ?Account $account = null;
 
     #[ORM\ManyToOne]
@@ -75,14 +76,17 @@ class Transaction
 
     #[ORM\Column]
     #[Groups(['transaction:read', 'transaction:write'])]
+    // @phpstan-ignore doctrine.columnType (set in constructor before persist)
     private ?\DateTimeImmutable $date = null;
 
     #[ORM\Column]
     #[Groups(['transaction:read'])]
+    // @phpstan-ignore doctrine.columnType (set by lifecycle callback before persist)
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column]
     #[Groups(['transaction:read'])]
+    // @phpstan-ignore doctrine.columnType (set by lifecycle callback before persist)
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\ManyToOne]
@@ -92,6 +96,7 @@ class Transaction
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    // @phpstan-ignore doctrine.associationType (always set before persist via SetUserListener or explicit setter)
     private ?User $user = null;
 
     public function getUser(): ?User { return $this->user; }
@@ -109,7 +114,7 @@ class Transaction
         return $this->id;
     }
 
-    public function getType(): ?string
+    public function getType(): string
     {
         return $this->type;
     }
@@ -120,7 +125,7 @@ class Transaction
         return $this;
     }
 
-    public function getAmount(): ?float
+    public function getAmount(): float
     {
         return $this->amount;
     }
